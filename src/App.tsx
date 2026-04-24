@@ -21,7 +21,10 @@ import {
   Layers,
   Info,
   CheckCircle,
-  Filter
+  Filter,
+  Building2,
+  Box,
+  Plane
 } from 'lucide-react';
 
 // --- Mock Data ---
@@ -33,26 +36,36 @@ const mockMerchants = [
     status: '运营中',
     phone: '13800138000',
     marketScope: '全部集市商品',
-    supplyStatus: '正常出价',
-    funds: { hkd: 12500.00, cny: 5000.00 },
+    funds: { hkd: 12500.00 },
     miniapp: { appId: 'wx05a115bf6c7802eb', version: 'v1.2.0', status: '已发布' },
-    payment: { mchId: '1600000001', overseasMchId: 'HK99001122', status: '已配置' },
+    payment: { domesticMchId: '1600000001', internationalMchId: 'HK99001122', status: '已配置' },
     filing: { customsCode: '312298001', port: '广州南沙' },
     children: [
       {
         id: '2055',
         name: 'HANNAH加盟店',
-        role: '下游主理人',
+        role: '主理人',
         status: '运营中',
         phone: '13900139000',
-        marketScope: '限定货源',
-        supplyStatus: '封禁出价',
-        funds: { hkd: 0.00, cny: 1200.00 },
+        funds: { hkd: 0.00 },
         miniapp: { appId: 'wx7af9b4c37423cd39', version: 'v1.1.0', status: '审核中' },
-        payment: { mchId: '1600000002', overseasMchId: '', status: '未配置' },
+        payment: { domesticMchId: '1600000001', linkedInfo: '复用服务商商户号', status: '未配置' },
         filing: { customsCode: '', port: '' },
       }
     ]
+  },
+  {
+    id: '1018',
+    name: '中出服免税',
+    role: '服务商',
+    status: '运营中',
+    phone: '13811138111',
+    marketScope: '自有货源',
+    funds: { hkd: 88000.00 },
+    miniapp: { appId: 'wx88a115bf6c7802ea', version: 'v1.5.0', status: '已发布' },
+    payment: { domesticMchId: '1600000088', internationalMchId: 'HK99001188', status: '已配置' },
+    filing: { customsCode: '312298002', port: '海南' },
+    children: []
   }
 ];
 
@@ -209,6 +222,12 @@ export default function App() {
   const [dupeCheckState, setDupeCheckState] = useState<'idle' | 'checking' | 'found' | 'clean'>('idle');
   const [dedupeModal, setDedupeModal] = useState<{isOpen: boolean}>({isOpen: false});
 
+  // Customs States
+  const [customsOrderDrawer, setCustomsOrderDrawer] = useState<{isOpen: boolean, order: any}>({isOpen: false, order: null});
+  const [customsProductDrawer, setCustomsProductDrawer] = useState<{isOpen: boolean, product: any}>({isOpen: false, product: null});
+  const [customsWechatConfigModal, setCustomsWechatConfigModal] = useState(false);
+  const [customsSFConfigModal, setCustomsSFConfigModal] = useState(false);
+
   // Navigation Items
   const navGroups = [
     {
@@ -224,6 +243,14 @@ export default function App() {
         { id: 'public-products', icon: Boxes, label: '公共商品库' },
         { id: 'hscode', icon: BookOpen, label: '公共备案与HSCode' },
         { id: 'mapping', icon: GitMerge, label: '商家分类映射' },
+      ]
+    },
+    {
+      title: '清关系统',
+      items: [
+        { id: 'customs-config', icon: Building2, label: '企业配置' },
+        { id: 'customs-products', icon: Box, label: '商品备案信息' },
+        { id: 'customs-orders', icon: Plane, label: '订单清关信息' }
       ]
     },
     {
@@ -247,18 +274,18 @@ export default function App() {
       <div className="flex-1 p-6 overflow-y-auto bg-gray-50">
         <div className="bg-white p-5 rounded-sm shadow-sm border border-gray-200 mb-4 flex justify-between items-center">
           <div className="flex gap-4">
-            <input type="text" placeholder="商家名称/ID/手机号" className="border border-gray-300 rounded px-3 py-1.5 text-sm w-64 focus:outline-none focus:border-blue-500" />
-            <select className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 text-gray-600">
+            <input type="text" placeholder="商家名称/ID/手机号" className="border border-gray-300 rounded px-3 py-1.5 text-sm w-64 focus:outline-none focus:border-brand/40" />
+            <select className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-brand/40 text-gray-600">
               <option value="">全部状态</option>
               <option value="active">运营中</option>
               <option value="closed">已关闭</option>
             </select>
-            <button className="bg-brand hover:bg-blue-600 text-white px-4 py-1.5 rounded text-sm transition-colors flex items-center gap-1.5">
+            <button className="bg-brand hover:bg-brand text-white px-4 py-1.5 rounded text-sm transition-colors flex items-center gap-1.5">
               <Search size={16} /> 搜索
             </button>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setAddModal({isOpen: true, type: 'provider'})} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm flex items-center gap-1.5 transition-colors shadow-sm">
+            <button onClick={() => setAddModal({isOpen: true, type: 'provider'})} className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm flex items-center gap-1.5 transition-colors shadow-sm">
               <Plus size={16} /> 新增服务商
             </button>
           </div>
@@ -272,8 +299,8 @@ export default function App() {
                 <th className="py-3 px-4 font-medium">商家名称/ID</th>
                 <th className="py-3 px-4 font-medium">角色定位</th>
                 <th className="py-3 px-4 font-medium">分销商品范围</th>
-                <th className="py-3 px-4 font-medium">供货资格</th>
-                <th className="py-3 px-4 font-medium">账户资金状态</th>
+                <th className="py-3 px-4 font-medium">商户号(支付)</th>
+                <th className="py-3 px-4 font-medium">账户资金(HKD)</th>
                 <th className="py-3 px-4 font-medium text-right">管理操作</th>
               </tr>
             </thead>
@@ -293,18 +320,19 @@ export default function App() {
                       <div className="text-gray-500 text-xs font-mono">{merchant.id}</div>
                     </td>
                     <td className="py-3 px-4"><Tag color="blue">{merchant.role}</Tag></td>
-                    <td className="py-3 px-4 text-gray-700">{merchant.marketScope}</td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded text-xs border ${merchant.supplyStatus === '正常出价' ? 'border-emerald-200 text-gray-700' : 'border-gray-200 text-gray-700'}`}>{merchant.supplyStatus}</span>
+                    <td className="py-3 px-4 text-gray-700">{merchant.role === "服务商" ? merchant.marketScope || "-" : "-"}</td>
+                    <td className="py-3 px-4 text-xs font-mono">
+                      <div className="text-gray-700">国内: {merchant.payment?.domesticMchId || '-'}</div>
+                      {merchant.payment && 'internationalMchId' in merchant.payment && <div className="text-gray-500 mt-0.5">国际: {(merchant.payment as any).internationalMchId}</div>}
+                      {merchant.payment && 'linkedInfo' in merchant.payment && <div className="text-brand mt-0.5 px-1 bg-brand-light/20 inline-block rounded">{(merchant.payment as any).linkedInfo}</div>}
                     </td>
-                    <td className="py-3 px-4 font-mono text-gray-600 text-xs font-medium">
-                      <div>HKD {merchant.funds.hkd.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-                      <div>CNY {merchant.funds.cny.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                    <td className="py-3 px-4 font-mono text-gray-800 text-sm font-medium">
+                      HKD {merchant.funds.hkd.toLocaleString('en-US', {minimumFractionDigits: 2})}
                     </td>
                     <td className="py-3 px-4 text-right space-x-3">
-                      <button onClick={() => setActiveNav('funds')} className="text-gray-700 hover:text-emerald-800 font-medium">对账</button>
-                      <button onClick={() => { setDetailDrawer({isOpen: true, merchant, activeTab: 'basic'}); setIsEditingMerchant(false); setEditingMarketScope(merchant.marketScope || '全部集市商品'); }} className="text-blue-600 hover:text-blue-800 font-medium">权限/基础设置</button>
-                      <button onClick={() => setTopupModal({isOpen: true, merchant})} className="text-blue-600 hover:text-blue-800 font-medium">充值</button>
+                      <button onClick={() => setActiveNav('funds')} className="text-gray-700 hover:text-gray-800 font-medium">对账</button>
+                      <button onClick={() => { setDetailDrawer({isOpen: true, merchant, activeTab: 'basic'}); setIsEditingMerchant(false); setEditingMarketScope(merchant.marketScope || '全部集市商品'); }} className="text-brand hover:text-brand-hover font-medium">权限/基础设置</button>
+                      <button onClick={() => setTopupModal({isOpen: true, merchant})} className="text-brand hover:text-brand-hover font-medium">充值</button>
                     </td>
                   </tr>
                   {expandedRows[merchant.id] && merchant.children?.map(child => (
@@ -318,18 +346,19 @@ export default function App() {
                         </div>
                       </td>
                       <td className="py-3 px-4"><Tag color="orange">{child.role}</Tag></td>
-                      <td className="py-3 px-4 text-gray-600">{child.marketScope}</td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded text-xs border ${child.supplyStatus === '正常出价' ? 'border-emerald-200 text-gray-700' : 'border-gray-200 text-gray-700'}`}>{child.supplyStatus}</span>
+                      <td className="py-3 px-4 text-gray-600">-</td>
+                      <td className="py-3 px-4 text-xs font-mono">
+                        <div className="text-gray-700">国内: {child.payment?.domesticMchId || '-'}</div>
+                        {child.payment && 'internationalMchId' in child.payment && <div className="text-gray-500 mt-0.5">国际: {(child.payment as any).internationalMchId}</div>}
+                        {child.payment && 'linkedInfo' in child.payment && <div className="text-brand mt-0.5 px-1.5 py-0.5 bg-brand-light/30 inline-block rounded">{(child.payment as any).linkedInfo}</div>}
                       </td>
-                      <td className="py-3 px-4 font-mono text-gray-600 text-xs font-medium">
-                        <div>HKD {child.funds.hkd.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-                        <div>CNY {child.funds.cny.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                      <td className="py-3 px-4 font-mono text-gray-800 text-sm font-medium">
+                        HKD {child.funds.hkd.toLocaleString('en-US', {minimumFractionDigits: 2})}
                       </td>
                       <td className="py-3 px-4 text-right space-x-3">
-                        <button onClick={() => setActiveNav('funds')} className="text-gray-700 hover:text-emerald-800 font-medium">对账</button>
-                        <button onClick={() => { setDetailDrawer({isOpen: true, merchant: child, activeTab: 'basic'}); setIsEditingMerchant(false); setEditingMarketScope(child.marketScope || '全部集市商品'); }} className="text-blue-600 hover:text-blue-800 font-medium">权限/基础设置</button>
-                        <button onClick={() => setTopupModal({isOpen: true, merchant: child})} className="text-blue-600 hover:text-blue-800 font-medium">充值</button>
+                        <button onClick={() => setActiveNav('funds')} className="text-gray-700 hover:text-gray-800 font-medium">对账</button>
+                        <button onClick={() => { setDetailDrawer({isOpen: true, merchant: child, activeTab: 'basic'}); setIsEditingMerchant(false); setEditingMarketScope((child as any).marketScope || '全部集市商品'); }} className="text-brand hover:text-brand-hover font-medium">权限/基础设置</button>
+                        <button onClick={() => setTopupModal({isOpen: true, merchant: child})} className="text-brand hover:text-brand-hover font-medium">充值</button>
                       </td>
                     </tr>
                   ))}
@@ -349,15 +378,15 @@ export default function App() {
           <AppWindow className="text-gray-500" /> 小程序授权与发布
         </h2>
         <div className="flex gap-2">
-          <button className="bg-white border border-gray-200 hover:border-blue-500 hover:text-blue-600 text-gray-700 px-4 py-2 rounded-md text-sm transition-colors">查看所有审核状态</button>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm transition-colors shadow-sm">新增授权</button>
+          <button className="bg-white border border-gray-200 hover:border-brand/40 hover:text-brand text-gray-700 px-4 py-2 rounded-md text-sm transition-colors">查看所有审核状态</button>
+          <button className="bg-brand hover:bg-brand-hover text-white px-4 py-2 rounded-md text-sm transition-colors shadow-sm">新增授权</button>
         </div>
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-4 flex gap-4 items-center">
-        <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-blue-500" placeholder="AppID / 应用名称" />
-        <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-blue-500" placeholder="绑定的商家名称" />
-        <button className="bg-brand hover:bg-blue-600 text-white px-5 py-1.5 rounded-md text-sm transition-colors">查询</button>
+        <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-brand/40" placeholder="AppID / 应用名称" />
+        <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-brand/40" placeholder="绑定的商家名称" />
+        <button className="bg-brand hover:bg-brand text-white px-5 py-1.5 rounded-md text-sm transition-colors">查询</button>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex-1">
@@ -377,7 +406,7 @@ export default function App() {
               <tr key={app.id} className="hover:bg-gray-50 transition-colors">
                 <td className="py-4 px-6 font-medium text-gray-800">{app.appName}</td>
                 <td className="py-4 px-4 font-mono text-gray-500">{app.id}</td>
-                <td className="py-4 px-4 text-blue-600 hover:underline cursor-pointer">{app.merchantName}</td>
+                <td className="py-4 px-4 text-brand hover:underline cursor-pointer">{app.merchantName}</td>
                 <td className="py-4 px-4 font-mono text-gray-600">{app.version}</td>
                 <td className="py-4 px-4">
                   <Tag color={app.status === '已发布' ? 'green' : 'orange'}>{app.status}</Tag>
@@ -819,9 +848,9 @@ export default function App() {
       {filingTab === 'product' && (
         <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden animate-in fade-in">
            <div className="p-4 border-b border-gray-200 flex gap-4 items-center bg-gray-50/50">
-              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-blue-500" placeholder="商家 ID" />
-              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-64 focus:outline-none focus:border-blue-500" placeholder="输入 SPU 货号查询" />
-              <button className="bg-brand hover:bg-blue-600 text-white px-5 py-1.5 rounded-md text-sm transition-colors">查询</button>
+              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-brand/40" placeholder="商家 ID" />
+              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-64 focus:outline-none focus:border-brand/40" placeholder="输入 SPU 货号查询" />
+              <button className="bg-brand hover:bg-brand text-white px-5 py-1.5 rounded-md text-sm transition-colors">查询</button>
            </div>
            <div className="flex-1 overflow-auto">
              <table className="w-full text-left text-sm">
@@ -841,12 +870,12 @@ export default function App() {
                       <td className="py-4 px-6 font-mono text-gray-600">{prod.id}</td>
                       <td className="py-4 px-4 text-gray-800">{prod.name}</td>
                       <td className="py-4 px-4 font-mono text-gray-500">1567</td>
-                      <td className="py-4 px-4"><span className="font-mono text-blue-600">{prod.filingInfo.hsCode}</span></td>
+                      <td className="py-4 px-4"><span className="font-mono text-brand">{prod.filingInfo.hsCode}</span></td>
                       <td className="py-4 px-4">
                         <Tag color={prod.filingInfo.status === '已备案' ? 'green' : 'orange'}>{prod.filingInfo.status}</Tag>
                       </td>
                       <td className="py-4 px-6 text-right space-x-3">
-                        <button onClick={() => setFilingModal({isOpen: true, product: prod})} className="text-blue-600 hover:text-brand font-medium">修改备案</button>
+                        <button onClick={() => setFilingModal({isOpen: true, product: prod})} className="text-brand hover:text-brand font-medium">修改备案</button>
                       </td>
                     </tr>
                   ))}
@@ -1057,17 +1086,17 @@ export default function App() {
 
       {/* Tabs */}
       <div className="flex gap-6 border-b border-gray-200 mb-6">
-        <button onClick={() => setFundsTab('orders')} className={`pb-3 text-sm font-medium border-b-2 transition-colors ${fundsTab === 'orders' ? 'border-emerald-500 text-gray-700' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
+        <button onClick={() => setFundsTab('orders')} className={`pb-3 text-sm font-medium border-b-2 transition-colors ${fundsTab === 'orders' ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
           订单交易流水
         </button>
-        <button onClick={() => setFundsTab('service')} className={`pb-3 text-sm font-medium border-b-2 transition-colors ${fundsTab === 'service' ? 'border-emerald-500 text-gray-700' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
+        <button onClick={() => setFundsTab('service')} className={`pb-3 text-sm font-medium border-b-2 transition-colors ${fundsTab === 'service' ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
           服务账户流水
         </button>
       </div>
 
       {fundsTab === 'orders' && (
         <div className="flex-1 flex flex-col animate-in fade-in">
-          <div className="bg-brand-light/20 border-l-4 border-blue-500 p-3 rounded-r text-sm text-gray-700 mb-6">
+          <div className="bg-brand-light/20 border-l-4 border-brand/40 p-3 rounded-r text-sm text-gray-700 mb-6">
             <span className="font-medium">核算公式：</span> 应收金额 = 用户实付 - 跨境支付手续费 | 销售毛利 = 应收金额 - 商品成本 - 税费 - 运费。
           </div>
 
@@ -1079,11 +1108,11 @@ export default function App() {
                 <span className="text-gray-400 px-2">至</span>
                 <input type="text" className="px-3 py-1.5 text-sm w-32 focus:outline-none" placeholder="结束日期" />
               </div>
-              <button className="bg-brand hover:bg-emerald-600 text-white px-5 py-1.5 rounded-md text-sm transition-colors">
+              <button className="bg-brand hover:bg-brand-hover text-white px-5 py-1.5 rounded-md text-sm transition-colors">
                 查询
               </button>
             </div>
-            <button className="bg-orange-400 hover:bg-gray-500 text-white px-4 py-1.5 rounded-md text-sm transition-colors shadow-sm">
+            <button className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1.5 rounded-md text-sm transition-colors shadow-sm">
               批量导出流水
             </button>
           </div>
@@ -1113,7 +1142,7 @@ export default function App() {
                 ].map((row, idx) => (
                   <tr key={idx} className="hover:bg-gray-50 transition-colors">
                     <td className="py-3 px-4">
-                      <div className="text-blue-600 font-medium hover:underline cursor-pointer">{row.store}</div>
+                      <div className="text-brand font-medium hover:underline cursor-pointer">{row.store}</div>
                       <div className="text-gray-400 text-xs font-mono">{row.id}</div>
                     </td>
                     <td className="py-3 px-4 text-gray-500 text-xs">{row.time.split(' ')[0]}<br/>{row.time.split(' ')[1]}</td>
@@ -1152,11 +1181,11 @@ export default function App() {
                 <span className="text-gray-400 px-2">至</span>
                 <input type="text" className="px-3 py-1.5 text-sm w-32 focus:outline-none" placeholder="结束日期" />
               </div>
-              <button className="bg-brand hover:bg-emerald-600 text-white px-5 py-1.5 rounded-md text-sm transition-colors">
+              <button className="bg-brand hover:bg-brand-hover text-white px-5 py-1.5 rounded-md text-sm transition-colors">
                 查询
               </button>
             </div>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-sm transition-colors shadow-sm flex items-center gap-1.5">
+            <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded-md text-sm transition-colors shadow-sm flex items-center gap-1.5">
               <Plus size={16} /> 新增充值/扣减
             </button>
           </div>
@@ -1204,6 +1233,241 @@ export default function App() {
       )}
     </div>
   );
+
+  const renderCustomsConfig = () => {
+    return (
+      <div className="animate-in fade-in duration-300 h-full flex flex-col">
+        <div className="bg-white border-b border-gray-200 px-6 py-4 flex flex-col gap-3 shrink-0">
+          <h2 className="text-xl font-semibold text-gray-800">企业配置</h2>
+        </div>
+        <div className="flex-1 p-6 overflow-y-auto bg-gray-50 flex flex-col gap-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 className="text-base font-semibold border-b border-gray-100 pb-3 mb-4">基本信息</h3>
+            <div className="grid grid-cols-3 gap-6 text-sm">
+              <div><span className="text-gray-500 mr-2">企业名称:</span> 斐宁(直邮)</div>
+              <div><span className="text-gray-500 mr-2">电话:</span> 15000000001</div>
+              <div><span className="text-gray-500 mr-2">登录账号:</span> feining</div>
+              <div className="flex items-center gap-2"><span className="text-gray-500">是否支付单:</span> <Tag color="green">是</Tag></div>
+              <div className="flex items-center gap-2"><span className="text-gray-500">是否推运单:</span> <Tag color="green">是</Tag></div>
+              <div className="flex items-center gap-2"><span className="text-gray-500">是否推订单:</span> <Tag color="green">是</Tag></div>
+              <div className="flex items-center gap-2"><span className="text-gray-500">是否推清单:</span> <Tag color="red">否</Tag></div>
+              <div className="col-span-2"><span className="text-gray-500 mr-2">app_key:</span> OnO6iBzoC0ukF1OVGsBURD9Z3tw9HXuT</div>
+              <div className="col-span-3"><span className="text-gray-500 mr-2">app_secret:</span> zParQjxdUf2mPYkPMiVF7aE23Rfxw5yJo7soHDlu</div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-6">
+            {/* 支付配置 */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-base font-semibold border-b border-gray-100 pb-3 mb-4">支付配置</h3>
+              <div className="flex flex-col gap-4 text-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2"><span className="text-gray-500">新易生:</span> <button className="text-brand hover:underline">报关配置</button></div>
+                  <div className="flex items-center gap-2"><span className="text-gray-500">微信:</span> <button onClick={() => setCustomsWechatConfigModal(true)} className="text-brand hover:underline">报关配置</button></div>
+                </div>
+                <div className="flex items-center gap-2"><span className="text-gray-500">香港微信:</span> <button className="text-brand hover:underline">报关配置</button></div>
+              </div>
+            </div>
+
+            {/* 运单配置 */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
+                <h3 className="text-base font-semibold">运单配置</h3>
+                <button className="text-brand hover:underline text-sm font-medium">推送设置</button>
+              </div>
+              <div className="flex flex-col gap-4 text-sm">
+                <div className="flex items-center gap-2"><span className="text-gray-500">顺丰直邮:</span> <button onClick={() => setCustomsSFConfigModal(true)} className="text-brand hover:underline">报关配置</button></div>
+              </div>
+            </div>
+
+            {/* 海关配置 */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-base font-semibold border-b border-gray-100 pb-3 mb-4">海关配置</h3>
+              <div className="flex flex-col gap-4 text-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2"><span className="text-gray-500">宁波:</span> <button className="text-brand hover:underline">订单报关配置</button></div>
+                  <div className="flex items-center gap-2"><span className="text-gray-500">宁波:</span> <button className="text-brand hover:underline">清单报关配置</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCustomsProducts = () => {
+    return (
+      <div className="animate-in fade-in duration-300 h-full flex flex-col">
+        <div className="bg-white border-b border-gray-200 px-6 py-4 flex flex-col gap-3 shrink-0">
+          <h2 className="text-xl font-semibold text-gray-800">商品列表</h2>
+        </div>
+        <div className="flex-1 p-6 overflow-y-auto bg-gray-50">
+          <div className="bg-white p-5 rounded-sm shadow-sm border border-gray-200 mb-4 flex justify-between items-center">
+            <div className="flex gap-4 items-center">
+              <label className="text-sm text-gray-600">备案名称:</label>
+              <input type="text" className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-brand/40" />
+              <label className="text-sm text-gray-600 ml-2">SKU:</label>
+              <input type="text" className="border border-gray-300 rounded px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-brand/40" />
+              <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors ml-2">搜索</button>
+              <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-1.5 rounded text-sm transition-colors">重置</button>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-t-sm border border-gray-200 border-b-0 flex gap-2">
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">新增</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">删除</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">商品导入</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">商品导出</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">同步菜鸟</button>
+          </div>
+          <div className="bg-white rounded-sm shadow-sm border border-gray-200">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200 text-gray-700">
+                <tr>
+                  <th className="py-3 px-4 font-medium w-10 text-center"><input type="checkbox" className="rounded text-brand focus:ring-brand accent-brand cursor-pointer" /></th>
+                  <th className="py-3 px-4 font-medium">备案名称</th>
+                  <th className="py-3 px-4 font-medium">商品sku</th>
+                  <th className="py-3 px-4 font-medium">备案单价</th>
+                  <th className="py-3 px-4 font-medium">菜鸟库存</th>
+                  <th className="py-3 px-4 font-medium">新增时间</th>
+                  <th className="py-3 px-4 font-medium">操作</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 placeholder-transparent">
+                {[
+                  { name: 'LILYSILK真丝衬衫', sku: 'LILYSILK2222', price: '176.00', inventory: '', date: '2026-04-19 11:07' },
+                  { name: 'LILYSILK男士睡衣', sku: 'LILYSILK8032', price: '176.00', inventory: '', date: '2026-04-19 11:06' },
+                  { name: 'Arc\'teryx男款Granville斜挎包', sku: 'X000009622BLACK', price: '804.00', inventory: '', date: '2026-04-14 17:33' },
+                  { name: 'Opening Ceremony男款圆领短袖T恤', sku: 'YMAA001F22JER0061025', price: '1685.00', inventory: '', date: '2026-04-14 16:48' },
+                ].map((item, i) => (
+                  <tr key={i} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-3 px-4 text-center"><input type="checkbox" className="rounded text-brand focus:ring-brand accent-brand cursor-pointer" /></td>
+                    <td className="py-3 px-4 text-gray-600">{item.name}</td>
+                    <td className="py-3 px-4 text-gray-600">{item.sku}</td>
+                    <td className="py-3 px-4 text-gray-600">{item.price}</td>
+                    <td className="py-3 px-4 text-gray-600">{item.inventory}</td>
+                    <td className="py-3 px-4 text-gray-500">{item.date}</td>
+                    <td className="py-3 px-4">
+                      <div className="flex gap-2">
+                        <button className="text-gray-600 hover:text-brand">编辑</button>
+                        <span className="text-gray-300">|</span>
+                        <button className="text-gray-600 hover:text-red-500">删除</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCustomsOrders = () => {
+    return (
+      <div className="animate-in fade-in duration-300 h-full flex flex-col">
+        <div className="bg-white border-b border-gray-200 px-6 py-4 flex flex-col gap-3 shrink-0">
+          <h2 className="text-xl font-semibold text-gray-800">订单列表</h2>
+        </div>
+        <div className="flex-1 p-6 overflow-y-auto bg-gray-50">
+          <div className="bg-white p-5 rounded-sm shadow-sm border border-gray-200 mb-4 flex flex-col gap-4">
+            <div className="flex gap-4 items-center flex-wrap">
+              <label className="text-sm text-gray-600 whitespace-nowrap">订单编号:</label>
+              <input type="text" className="border border-gray-300 rounded px-3 py-1.5 text-sm w-40 focus:outline-none focus:border-brand/40" />
+              <label className="text-sm text-gray-600 whitespace-nowrap">支付单状态:</label>
+              <select className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 focus:outline-none focus:border-brand/40 text-gray-600"><option></option></select>
+              <label className="text-sm text-gray-600 whitespace-nowrap">运单状态:</label>
+              <select className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 focus:outline-none focus:border-brand/40 text-gray-600"><option></option></select>
+              <label className="text-sm text-gray-600 whitespace-nowrap">物流通知:</label>
+              <select className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 focus:outline-none focus:border-brand/40 text-gray-600"><option></option></select>
+              <label className="text-sm text-gray-600 whitespace-nowrap">订单状态:</label>
+              <select className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 focus:outline-none focus:border-brand/40 text-gray-600"><option></option></select>
+              <label className="text-sm text-gray-600 whitespace-nowrap">清单状态:</label>
+              <select className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 focus:outline-none focus:border-brand/40 text-gray-600"><option></option></select>
+              <label className="text-sm text-gray-600 whitespace-nowrap mt-2">清单放行通知:</label>
+              <select className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32 focus:outline-none focus:border-brand/40 text-gray-600 mt-2"><option></option></select>
+            </div>
+            <div className="flex gap-2">
+              <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">搜索</button>
+              <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-1.5 rounded text-sm transition-colors">重置</button>
+            </div>
+          </div>
+
+          <div className="bg-white p-4 rounded-t-sm border border-gray-200 border-b-0 flex gap-2 flex-wrap">
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">推送支付单</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">推送运单</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">推送订单</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">推送清单</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">物流通知</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">清单通知</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">订单导入</button>
+             <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm transition-colors">订单导出</button>
+             <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded text-sm transition-colors">批量删除</button>
+          </div>
+          
+          <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
+              <thead className="bg-gray-50 border-b border-gray-200 text-gray-700">
+                <tr>
+                  <th className="py-3 px-4 font-medium w-10 text-center"><input type="checkbox" className="rounded text-brand focus:ring-brand accent-brand cursor-pointer" /></th>
+                  <th className="py-3 px-4 font-medium">通关类型</th>
+                  <th className="py-3 px-4 font-medium">订单编号</th>
+                  <th className="py-3 px-4 font-medium">订单金额</th>
+                  <th className="py-3 px-4 font-medium">仓储/物流</th>
+                  <th className="py-3 px-4 font-medium">物流公司名称</th>
+                  <th className="py-3 px-4 font-medium">物流单号</th>
+                  <th className="py-3 px-4 font-medium">支付单状态</th>
+                  <th className="py-3 px-4 font-medium">运单状态</th>
+                  <th className="py-3 px-4 font-medium">物流通知</th>
+                  <th className="py-3 px-4 font-medium">订单状态</th>
+                  <th className="py-3 px-4 font-medium">清单状态</th>
+                  <th className="py-3 px-4 font-medium">清单放行通知</th>
+                  <th className="py-3 px-4 font-medium">新增时间</th>
+                  <th className="py-3 px-4 font-medium">操作</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {[
+                  { id: '2260202604191135415352304', type: '直邮', amount: '485.50', storage: '顺丰直邮', logiName: '顺丰快递', logiNo: 'SF0227352733802', date: '2026-04-19 11:35' },
+                  { id: '2260202604182148085161772', type: '直邮', amount: '714.61', storage: '顺丰直邮', logiName: '顺丰快递', logiNo: 'SF5130957954141', date: '2026-04-18 21:48' },
+                  { id: '1023202604171013573223897', type: '直邮', amount: '310.94', storage: '顺丰直邮', logiName: '顺丰快递', logiNo: 'SF0225812743949', date: '2026-04-17 10:14' },
+                ].map((item, i) => (
+                  <tr key={i} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-3 px-4 text-center"><input type="checkbox" className="rounded text-brand focus:ring-brand accent-brand cursor-pointer" /></td>
+                    <td className="py-3 px-4 text-gray-600">{item.type}</td>
+                    <td className="py-3 px-4 text-gray-900 font-mono">{item.id}</td>
+                    <td className="py-3 px-4 text-gray-600">{item.amount}</td>
+                    <td className="py-3 px-4 text-gray-600 leading-tight"><div className="w-16 break-words whitespace-normal">{item.storage}</div></td>
+                    <td className="py-3 px-4 text-gray-600">{item.logiName}</td>
+                    <td className="py-3 px-4 text-gray-600 font-mono">{item.logiNo}</td>
+                    <td className="py-3 px-4"><span className="text-green-500 border border-green-200 bg-green-50 px-1.5 py-0.5 rounded text-xs">推送成功</span></td>
+                    <td className="py-3 px-4"><span className="text-green-500 border border-green-200 bg-green-50 px-1.5 py-0.5 rounded text-xs">推送成功</span></td>
+                    <td className="py-3 px-4"><span className="text-green-500 border border-green-200 bg-green-50 px-1.5 py-0.5 rounded text-xs">通知成功</span></td>
+                    <td className="py-3 px-4"><span className="text-green-500 border border-green-200 bg-green-50 px-1.5 py-0.5 rounded text-xs">推送成功</span></td>
+                    <td className="py-3 px-4"><span className="text-purple-500 border border-purple-200 bg-purple-50 px-1.5 py-0.5 rounded text-xs">不推送</span></td>
+                    <td className="py-3 px-4"><span className="text-gray-500 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded text-xs">未通知</span></td>
+                    <td className="py-3 px-4 text-gray-500 text-center leading-tight whitespace-normal w-24">
+                      {item.date.split(' ')[0]}<br/>{item.date.split(' ')[1]}
+                    </td>
+                    <td className="py-3 px-4">
+                       <div className="flex gap-2">
+                        <button className="text-gray-600 hover:text-brand">查看</button>
+                        <span className="text-gray-300">|</span>
+                        <button className="text-gray-600 hover:text-brand">面单</button>
+                        <span className="text-gray-300">|</span>
+                        <button className="text-gray-600 hover:text-brand">编辑</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // --- Main Render ---
   return (
@@ -1253,6 +1517,9 @@ export default function App() {
         {activeNav === 'hscode' && renderHSCodeView()}
         {activeNav === 'funds' && renderFundsView()}
         {activeNav === 'mapping' && renderCategoryMappingView()}
+        {activeNav === 'customs-config' && renderCustomsConfig()}
+        {activeNav === 'customs-products' && renderCustomsProducts()}
+        {activeNav === 'customs-orders' && renderCustomsOrders()}
       </div>
 
       {/* --- Modals & Drawers --- */}
@@ -1265,7 +1532,7 @@ export default function App() {
               <div className="flex items-center gap-3">
                 <h2 className="text-lg font-semibold text-gray-800">{detailDrawer.merchant.name}</h2>
                 <Tag color={detailDrawer.merchant.role === '服务商' ? 'blue' : 'orange'}>{detailDrawer.merchant.role}</Tag>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${detailDrawer.merchant.status === '运营中' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-600'}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${detailDrawer.merchant.status === '运营中' ? 'bg-gray-100 border border-gray-200 text-gray-700' : 'bg-gray-200 text-gray-600'}`}>
                   {detailDrawer.merchant.status}
                 </span>
               </div>
@@ -1285,7 +1552,7 @@ export default function App() {
                   onClick={() => setDetailDrawer(prev => ({...prev, activeTab: tab.id}))}
                   className={`px-4 py-2.5 text-sm font-medium border-b-2 flex items-center gap-2 transition-colors ${
                     detailDrawer.activeTab === tab.id 
-                      ? 'border-blue-600 text-blue-600' 
+                      ? 'border-brand text-brand' 
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -1300,13 +1567,13 @@ export default function App() {
               {detailDrawer.activeTab === 'basic' && (
                 <div className="space-y-6 animate-in fade-in duration-200">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3">基本资料</h3>
+                    <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">基本资料</h3>
                     {!isEditingMerchant ? (
-                      <button onClick={() => setIsEditingMerchant(true)} className="text-blue-600 text-sm flex items-center gap-1 hover:underline"><Edit2 size={14}/> 编辑信息</button>
+                      <button onClick={() => setIsEditingMerchant(true)} className="text-brand text-sm flex items-center gap-1 hover:underline"><Edit2 size={14}/> 编辑信息</button>
                     ) : (
                       <div className="flex gap-2">
                         <button onClick={() => setIsEditingMerchant(false)} className="text-gray-500 text-sm hover:underline">取消</button>
-                        <button onClick={() => setIsEditingMerchant(false)} className="bg-blue-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1 hover:bg-blue-700"><Save size={14}/> 保存</button>
+                        <button onClick={() => setIsEditingMerchant(false)} className="bg-brand text-white px-3 py-1 rounded text-sm flex items-center gap-1 hover:bg-brand-hover"><Save size={14}/> 保存</button>
                       </div>
                     )}
                   </div>
@@ -1319,22 +1586,22 @@ export default function App() {
                       </div>
                       <div>
                         <label className="text-gray-500 block mb-1.5">登录手机号</label>
-                        <input type="text" defaultValue={detailDrawer.merchant.phone} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                        <input type="text" defaultValue={detailDrawer.merchant.phone} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
                       </div>
                       <div>
                         <label className="text-gray-500 block mb-1.5">商家名称</label>
-                        <input type="text" defaultValue={detailDrawer.merchant.name} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                        <input type="text" defaultValue={detailDrawer.merchant.name} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
                       </div>
                       <div>
                         <label className="text-gray-500 block mb-1.5">角色类型</label>
-                        <select defaultValue={detailDrawer.merchant.role} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+                        <select defaultValue={detailDrawer.merchant.role} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none">
                           <option>服务商</option>
-                          <option>下游主理人</option>
+                          <option>主理人</option>
                         </select>
                       </div>
                       <div>
                         <label className="text-gray-500 block mb-1.5">当前状态</label>
-                        <select defaultValue={detailDrawer.merchant.status} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+                        <select defaultValue={detailDrawer.merchant.status} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none">
                           <option value="运营中">运营中</option>
                           <option value="已关闭">已关闭</option>
                         </select>
@@ -1353,23 +1620,27 @@ export default function App() {
 
                   <div className="pt-6 border-t border-gray-200 mt-6">
                     <div className="flex justify-between items-center mb-6">
-                      <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3">集市业务属性与权限</h3>
-                      {!isEditingMerchant ? (
-                        <button onClick={() => setIsEditingMerchant(true)} className="text-blue-600 text-sm flex items-center gap-1 hover:underline"><Edit2 size={14}/> 编辑权限</button>
+                      <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">集市业务属性与权限</h3>
+                      {(!isEditingMerchant && detailDrawer.merchant.role === '服务商') ? (
+                        <button onClick={() => setIsEditingMerchant(true)} className="text-brand text-sm flex items-center gap-1 hover:underline"><Edit2 size={14}/> 编辑权限</button>
                       ) : null}
                     </div>
                     
-                    {isEditingMerchant ? (
+                    {detailDrawer.merchant.role === '主理人' ? (
+                       <div className="text-sm text-gray-500 italic bg-gray-50 p-4 rounded-lg border border-gray-200">
+                         作为主理人角色，集市选品范围继承自上级服务商，此项不可独立设置。
+                       </div>
+                    ) : (isEditingMerchant && detailDrawer.merchant.role === '服务商') ? (
                       <div className="space-y-6 bg-gray-50 p-5 rounded-lg border border-gray-200">
                         <div>
-                          <label className="text-blue-600 font-medium block mb-3 text-sm border-l-2 border-blue-600 pl-2">作为【买方】的集市选品获取范围</label>
+                          <label className="text-brand font-medium block mb-3 text-sm border-l-2 border-brand pl-2">作为【买方】的集市选品获取范围</label>
                           <div className="flex gap-6 mb-4">
                             <label className="flex items-center gap-2 text-sm cursor-pointer">
-                              <input type="radio" name="marketScope" checked={editingMarketScope === '全部集市商品'} onChange={() => setEditingMarketScope('全部集市商品')} className="text-blue-600 focus:ring-blue-500" />
+                              <input type="radio" name="marketScope" checked={editingMarketScope === '全部集市商品'} onChange={() => setEditingMarketScope('全部集市商品')} className="text-brand focus:ring-brand" />
                               全部集市商品
                             </label>
                             <label className="flex items-center gap-2 text-sm cursor-pointer">
-                              <input type="radio" name="marketScope" checked={editingMarketScope === '限定货源'} onChange={() => setEditingMarketScope('限定货源')} className="text-blue-600 focus:ring-blue-500" />
+                              <input type="radio" name="marketScope" checked={editingMarketScope === '限定货源'} onChange={() => setEditingMarketScope('限定货源')} className="text-brand focus:ring-brand" />
                               限定货源
                             </label>
                           </div>
@@ -1380,7 +1651,7 @@ export default function App() {
                               <div className="flex gap-3 items-center mb-3">
                                 {/* Merchant Searchable Select */}
                                 <div className="relative group">
-                                  <div className="flex items-center border border-gray-300 rounded px-2 py-1.5 bg-white w-44 focus-within:border-black focus-within:ring-1 focus-within:ring-black cursor-text transition-all">
+                                  <div className="flex items-center border border-gray-300 rounded px-2 py-1.5 bg-white w-44 focus-within:border-brand focus-within:ring-1 focus-within:ring-brand cursor-text transition-all">
                                     <Search size={14} className="text-gray-400 mr-1.5 flex-shrink-0" />
                                     <input type="text" placeholder="搜索商家..." className="w-full text-sm outline-none bg-transparent min-w-0 text-gray-700 placeholder:text-gray-400" />
                                     <ChevronDown size={14} className="text-gray-400 ml-1 flex-shrink-0" />
@@ -1453,56 +1724,39 @@ export default function App() {
                             </div>
                           )}
                         </div>
-                        <div className="border-t border-gray-200 pt-6">
-                          <label className="text-blue-600 font-medium block mb-3 text-sm border-l-2 border-blue-600 pl-2">作为【卖方/货主】的集市供货权限</label>
-                          <div className="flex gap-6">
-                            <label className="flex items-center gap-2 text-sm cursor-pointer">
-                              <input type="radio" name="supplyStatus" defaultChecked={detailDrawer.merchant.supplyStatus === '正常出价'} className="text-gray-700 focus:ring-emerald-500" />
-                              <span className="text-gray-700">正常供货</span>
-                            </label>
-                            <label className="flex items-center gap-2 text-sm cursor-pointer">
-                              <input type="radio" name="supplyStatus" defaultChecked={detailDrawer.merchant.supplyStatus === '封禁出价'} className="text-gray-700 focus:ring-red-500" />
-                              <span className="text-gray-700">封禁出价</span>
-                            </label>
-                          </div>
-                        </div>
                       </div>
-                    ) : (
+                    ) : (detailDrawer.merchant.role === '服务商') ? (
                       <div className="grid grid-cols-2 gap-y-6 gap-x-8 text-sm">
                         <div>
-                          <span className="text-gray-500 block mb-1">作为【买方】的集市选品获取范围</span>
-                          <span className="text-gray-800">{detailDrawer.merchant.marketScope}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 block mb-1">作为【卖方/货主】的集市供货权限</span>
-                          <span className={detailDrawer.merchant.supplyStatus === '正常出价' ? 'text-gray-700' : 'text-gray-700'}>{detailDrawer.merchant.supplyStatus}</span>
+                          <span className="text-gray-500 block mb-1">作为买方的选品范围</span>
+                          <span className="text-gray-800">{detailDrawer.merchant.marketScope || '全部集市商品'}</span>
                         </div>
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               )}
               {detailDrawer.activeTab === 'miniapp' && (
                 <div className="space-y-6 animate-in fade-in duration-200">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3">绑定的小程序</h3>
+                    <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">绑定的小程序</h3>
                     <button 
                       onClick={() => { setDetailDrawer(prev => ({...prev, isOpen: false})); setActiveNav('miniapps'); }} 
-                      className="text-blue-600 text-sm flex items-center gap-1 hover:underline"
+                      className="text-brand text-sm flex items-center gap-1 hover:underline"
                     >
                       <LinkIcon size={14}/> 前往全局授权管理
                     </button>
                   </div>
                   <div className="bg-gray-50 p-5 rounded-lg border border-gray-200 grid grid-cols-2 gap-6 text-sm">
                     <div><span className="text-gray-500 block mb-1.5">AppID</span><span className="font-mono text-gray-800">{detailDrawer.merchant.miniapp?.appId || '未绑定'}</span></div>
-                    <div><span className="text-gray-500 block mb-1.5">当前线上版本</span><span className="font-bold text-blue-600">{detailDrawer.merchant.miniapp?.version || '--'}</span></div>
+                    <div><span className="text-gray-500 block mb-1.5">当前线上版本</span><span className="font-bold text-brand">{detailDrawer.merchant.miniapp?.version || '--'}</span></div>
                     <div><span className="text-gray-500 block mb-1.5">发布状态</span><span className="text-gray-800">{detailDrawer.merchant.miniapp?.status || '--'}</span></div>
                   </div>
                   <div className="pt-4 border-t border-gray-100">
                     <h4 className="text-sm font-medium text-gray-800 mb-3">商家专属快捷操作</h4>
                     <div className="flex flex-wrap gap-3">
                       {['设置店铺代码', '提交审核', '发布', '体验二维码'].map(action => (
-                        <button key={action} className="px-3 py-1.5 bg-white border border-gray-200 rounded text-sm text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors">
+                        <button key={action} className="px-3 py-1.5 bg-white border border-gray-200 rounded text-sm text-gray-600 hover:border-brand/40 hover:text-brand transition-colors">
                           {action}
                         </button>
                       ))}
@@ -1513,17 +1767,17 @@ export default function App() {
               {detailDrawer.activeTab === 'payment' && (
                 <div className="space-y-6 animate-in fade-in duration-200">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3">微信支付商户号配置</h3>
-                    <button className="text-blue-600 text-sm hover:underline font-medium">修改配置</button>
+                    <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">微信支付商户号配置</h3>
+                    <button className="text-brand text-sm hover:underline font-medium">修改配置</button>
                   </div>
                   <div className="bg-gray-50 p-5 rounded-lg border border-gray-200 grid grid-cols-2 gap-6 text-sm">
-                    <div><span className="text-gray-500 block mb-1.5">国内商户号 (MchID)</span><span className="font-mono text-gray-800">{detailDrawer.merchant.payment?.mchId || '未配置'}</span></div>
+                    <div><span className="text-gray-500 block mb-1.5">国内商户号 (MchID)</span><span className="font-mono text-gray-800">{detailDrawer.merchant.payment?.domesticMchId || '未配置'}</span></div>
                     <div><span className="text-gray-500 block mb-1.5">配置状态</span><span className="text-gray-700 font-medium">{detailDrawer.merchant.payment?.status || '未配置'}</span></div>
                     
                     {detailDrawer.merchant.role === '服务商' && (
                       <div className="col-span-2 pt-4 border-t border-gray-200 mt-2">
-                        <span className="text-gray-500 block mb-1.5">海外商户号 (Overseas MchID)</span>
-                        <span className="font-mono text-gray-800">{detailDrawer.merchant.payment?.overseasMchId || '未配置'}</span>
+                        <span className="text-gray-500 block mb-1.5">国际商户号 (Overseas MchID)</span>
+                        <span className="font-mono text-gray-800">{detailDrawer.merchant.payment?.internationalMchId || '未配置'}</span>
                       </div>
                     )}
                     
@@ -1534,8 +1788,8 @@ export default function App() {
               {detailDrawer.activeTab === 'filing' && (
                 <div className="space-y-6 animate-in fade-in duration-200">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3">商家独立备案配置</h3>
-                    <button className="text-blue-600 text-sm hover:underline font-medium">修改配置</button>
+                    <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">商家独立备案配置</h3>
+                    <button className="text-brand text-sm hover:underline font-medium">修改配置</button>
                   </div>
                   <div className="text-sm text-gray-500 bg-brand-light/20 p-3 rounded border border-brand/30 mb-4">
                     在此处配置该商家的专属备案信息。当该商家映射公共库商品时，系统将优先使用此处的配置信息进行海关申报。
@@ -1568,19 +1822,19 @@ export default function App() {
               )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">商家名称 <span className="text-brand">*</span></label>
-                <input type="text" placeholder="请输入商家营业执照名称" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all" />
+                <input type="text" placeholder="请输入商家营业执照名称" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">登录手机号 <span className="text-brand">*</span></label>
-                <input type="text" placeholder="11位手机号，将作为该商家的唯一登录账号" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all" />
+                <input type="text" placeholder="11位手机号，将作为该商家的唯一登录账号" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all" />
                 <p className="text-xs text-gray-400 mt-2 flex items-start gap-1">
-                  <span className="text-blue-500 mt-0.5">*</span> 创建成功后，系统将自动发送包含初始密码的短信至该手机号。
+                  <span className="text-brand mt-0.5">*</span> 创建成功后，系统将自动发送包含初始密码的短信至该手机号。
                 </p>
               </div>
             </div>
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
               <button onClick={() => setAddModal({isOpen: false, type: 'provider'})} className="px-5 py-2 text-sm text-gray-600 hover:bg-gray-200 rounded-md transition-colors font-medium">取消</button>
-              <button onClick={() => setAddModal({isOpen: false, type: 'provider'})} className="px-5 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors font-medium shadow-sm">确认创建</button>
+              <button onClick={() => setAddModal({isOpen: false, type: 'provider'})} className="px-5 py-2 text-sm bg-brand text-white hover:bg-brand-hover rounded-md transition-colors font-medium shadow-sm">确认创建</button>
             </div>
           </div>
         </div>
@@ -1596,7 +1850,7 @@ export default function App() {
                 <span className="text-gray-500 font-mono text-sm">货号: {productDrawer.product.id}</span>
               </div>
               <div className="flex items-center gap-3">
-                <button onClick={() => setProductDrawer({isOpen: false, product: null})} className="bg-blue-600 text-white px-4 py-1.5 rounded text-sm hover:bg-blue-700 flex items-center gap-1.5 shadow-sm">
+                <button onClick={() => setProductDrawer({isOpen: false, product: null})} className="bg-brand text-white px-4 py-1.5 rounded text-sm hover:bg-brand-hover flex items-center gap-1.5 shadow-sm">
                   <Save size={14} /> 保存修改
                 </button>
                 <button onClick={() => setProductDrawer({isOpen: false, product: null})} className="text-gray-400 hover:text-gray-600 p-1"><X size={20} /></button>
@@ -1607,16 +1861,16 @@ export default function App() {
               
               {/* Section 1: Product Info & Images */}
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3 mb-5">商品图文信息</h3>
+                <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3 mb-5">商品图文信息</h3>
                 <div className="grid grid-cols-2 gap-6 mb-6">
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">商品名称</label>
-                    <input type="text" defaultValue={productDrawer.product.name} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" defaultValue={productDrawer.product.name} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">品牌</label>
                     <div className="relative group/brand w-full">
-                      <div className="flex items-center border border-gray-300 rounded px-3 py-2 text-sm focus-within:border-black focus-within:ring-1 focus-within:ring-black bg-white cursor-text w-full transition-all">
+                      <div className="flex items-center border border-gray-300 rounded px-3 py-2 text-sm focus-within:border-brand focus-within:ring-1 focus-within:ring-brand bg-white cursor-text w-full transition-all">
                         <Search size={14} className="text-gray-400 mr-2 shrink-0" />
                         <input type="text" placeholder="搜索品牌..." defaultValue={productDrawer.product.brand} className="w-full outline-none bg-transparent min-w-0" />
                         <ChevronDown size={14} className="text-gray-400 ml-1 shrink-0" />
@@ -1635,7 +1889,7 @@ export default function App() {
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">分类</label>
                     <div className="relative group/category w-full">
-                      <div className="flex items-center border border-gray-300 rounded px-3 py-2 text-sm focus-within:border-black focus-within:ring-1 focus-within:ring-black bg-white cursor-text w-full transition-all">
+                      <div className="flex items-center border border-gray-300 rounded px-3 py-2 text-sm focus-within:border-brand focus-within:ring-1 focus-within:ring-brand bg-white cursor-text w-full transition-all">
                         <Search size={14} className="text-gray-400 mr-2 shrink-0" />
                         <input type="text" placeholder="搜索分类..." defaultValue={productDrawer.product.category} className="w-full outline-none bg-transparent min-w-0" />
                         <ChevronDown size={14} className="text-gray-400 ml-1 shrink-0" />
@@ -1658,7 +1912,7 @@ export default function App() {
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">官方指导价</label>
-                    <input type="text" defaultValue={productDrawer.product.price} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" defaultValue={productDrawer.product.price} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                 </div>
                 
@@ -1674,7 +1928,7 @@ export default function App() {
                           </div>
                         </div>
                       ))}
-                      <button className="w-20 h-20 border border-gray-300 border-dashed rounded flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-colors bg-gray-50">
+                      <button className="w-20 h-20 border border-gray-300 border-dashed rounded flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-brand/40 transition-colors bg-gray-50">
                         <Plus size={20} />
                         <span className="text-xs mt-1">上传</span>
                       </button>
@@ -1691,7 +1945,7 @@ export default function App() {
                           </div>
                         </div>
                       ))}
-                      <button className="w-20 h-20 border border-gray-300 border-dashed rounded flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-colors bg-gray-50">
+                      <button className="w-20 h-20 border border-gray-300 border-dashed rounded flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-brand/40 transition-colors bg-gray-50">
                         <Plus size={20} />
                         <span className="text-xs mt-1">上传</span>
                       </button>
@@ -1703,48 +1957,48 @@ export default function App() {
               {/* Section 2: Filing Info */}
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                 <div className="flex justify-between items-center mb-5">
-                  <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3">海关备案信息</h3>
-                  <button className="text-blue-600 border border-blue-600 hover:bg-brand-light/20 px-3 py-1.5 rounded text-sm flex items-center gap-1.5 transition-colors">
+                  <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">海关备案信息</h3>
+                  <button className="text-brand border border-brand hover:bg-brand-light/20 px-3 py-1.5 rounded text-sm flex items-center gap-1.5 transition-colors">
                     <ShieldCheck size={14} /> 重新发起备案
                   </button>
                 </div>
                 <div className="grid grid-cols-3 gap-6">
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">HS Code</label>
-                    <input type="text" defaultValue={productDrawer.product.filingInfo.hsCode} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono" />
+                    <input type="text" defaultValue={productDrawer.product.filingInfo.hsCode} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none font-mono" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">净重 (kg)</label>
-                    <input type="text" defaultValue={productDrawer.product.filingInfo.netWeight} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" defaultValue={productDrawer.product.filingInfo.netWeight} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">毛重 (kg)</label>
-                    <input type="text" defaultValue={productDrawer.product.filingInfo.grossWeight} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" defaultValue={productDrawer.product.filingInfo.grossWeight} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">第一计量单位</label>
-                    <input type="text" defaultValue={productDrawer.product.filingInfo.unit1} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" defaultValue={productDrawer.product.filingInfo.unit1} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">第一计量数量</label>
-                    <input type="text" defaultValue={productDrawer.product.filingInfo.qty1} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" defaultValue={productDrawer.product.filingInfo.qty1} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">常用单位</label>
-                    <input type="text" defaultValue={productDrawer.product.filingInfo.commonUnit} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" defaultValue={productDrawer.product.filingInfo.commonUnit} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">第二计量单位</label>
-                    <input type="text" defaultValue={productDrawer.product.filingInfo.unit2} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" defaultValue={productDrawer.product.filingInfo.unit2} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">第二计量数量</label>
-                    <input type="text" defaultValue={productDrawer.product.filingInfo.qty2} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" defaultValue={productDrawer.product.filingInfo.qty2} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div className="col-span-3">
                     <label className="text-gray-500 block mb-1.5 text-sm">当前备案状态</label>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-1 rounded text-xs font-medium ${productDrawer.product.filingInfo.status === '已备案' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'}`}>
+                      <span className={`px-2.5 py-1 rounded text-xs font-medium ${productDrawer.product.filingInfo.status === '已备案' ? 'bg-gray-100 border border-gray-200 text-gray-700' : 'bg-orange-100 text-orange-700'}`}>
                         {productDrawer.product.filingInfo.status}
                       </span>
                       <span className="text-xs text-gray-400">最后更新于 2026-04-08 10:00:00</span>
@@ -1756,8 +2010,8 @@ export default function App() {
               {/* Section 3: SKU & Tax */}
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                 <div className="flex justify-between items-center mb-5">
-                  <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3">SKU与税率配置</h3>
-                  <button className="text-blue-600 hover:underline text-sm flex items-center gap-1">
+                  <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">SKU与税率配置</h3>
+                  <button className="text-brand hover:underline text-sm flex items-center gap-1">
                     <Plus size={14} /> 添加SKU
                   </button>
                 </div>
@@ -1773,10 +2027,10 @@ export default function App() {
                     {productDrawer.product.skus.map((sku: any, idx: number) => (
                       <tr key={idx} className="hover:bg-gray-50">
                         <td className="py-2 px-4">
-                          <input type="text" defaultValue={sku.spec} className="border border-gray-300 rounded px-2 py-1 text-sm w-full focus:border-blue-500 outline-none" />
+                          <input type="text" defaultValue={sku.spec} className="border border-gray-300 rounded px-2 py-1 text-sm w-full focus:border-brand/40 outline-none" />
                         </td>
                         <td className="py-2 px-4">
-                          <select defaultValue={sku.taxRate} className="border border-gray-300 rounded px-2 py-1 text-sm focus:border-blue-500 outline-none">
+                          <select defaultValue={sku.taxRate} className="border border-gray-300 rounded px-2 py-1 text-sm focus:border-brand/40 outline-none">
                             <option value="9.1%">9.1%</option>
                             <option value="23.1%">23.1%</option>
                           </select>
@@ -1806,7 +2060,7 @@ export default function App() {
                 <h2 className="text-lg font-semibold text-gray-800">新增公共 SPU</h2>
               </div>
               <div className="flex items-center gap-3">
-                <button onClick={() => setAddProductDrawer({isOpen: false})} className="bg-blue-600 text-white px-4 py-1.5 rounded text-sm hover:bg-blue-700 flex items-center gap-1.5 shadow-sm">
+                <button onClick={() => setAddProductDrawer({isOpen: false})} className="bg-brand text-white px-4 py-1.5 rounded text-sm hover:bg-brand-hover flex items-center gap-1.5 shadow-sm">
                   <Plus size={14} /> 创建 SPU
                 </button>
                 <button onClick={() => setAddProductDrawer({isOpen: false})} className="text-gray-400 hover:text-gray-600 p-1"><X size={20} /></button>
@@ -1817,11 +2071,11 @@ export default function App() {
               
               {/* Section 1: Product Info & Images */}
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3 mb-5">商品图文信息</h3>
+                <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3 mb-5">商品图文信息</h3>
                 <div className="grid grid-cols-2 gap-6 mb-6">
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">商品名称</label>
-                    <input type="text" placeholder="请输入商品名称" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" placeholder="请输入商品名称" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">品牌</label>
@@ -1868,7 +2122,7 @@ export default function App() {
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">官方指导价</label>
-                    <input type="text" placeholder="请输入官方指导价" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" placeholder="请输入官方指导价" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                 </div>
                 
@@ -1876,7 +2130,7 @@ export default function App() {
                   <div>
                     <label className="text-gray-500 block mb-2 text-sm">商品主图 (含细节图)</label>
                     <div className="flex gap-3 flex-wrap">
-                      <button className="w-20 h-20 border border-gray-300 border-dashed rounded flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-colors bg-gray-50">
+                      <button className="w-20 h-20 border border-gray-300 border-dashed rounded flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-brand/40 transition-colors bg-gray-50">
                         <Plus size={20} />
                         <span className="text-xs mt-1">上传</span>
                       </button>
@@ -1885,7 +2139,7 @@ export default function App() {
                   <div>
                     <label className="text-gray-500 block mb-2 text-sm">开箱/穿搭图</label>
                     <div className="flex gap-3 flex-wrap">
-                      <button className="w-20 h-20 border border-gray-300 border-dashed rounded flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-colors bg-gray-50">
+                      <button className="w-20 h-20 border border-gray-300 border-dashed rounded flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-brand/40 transition-colors bg-gray-50">
                         <Plus size={20} />
                         <span className="text-xs mt-1">上传</span>
                       </button>
@@ -1897,41 +2151,41 @@ export default function App() {
               {/* Section 2: Filing Info */}
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                 <div className="flex justify-between items-center mb-5">
-                  <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3">海关备案信息</h3>
+                  <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">海关备案信息</h3>
                   <span className="text-xs text-gray-400">选择分类后将自动带入默认备案信息</span>
                 </div>
                 <div className="grid grid-cols-3 gap-6">
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">HS Code</label>
-                    <input type="text" placeholder="自动带入或手动输入" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono" />
+                    <input type="text" placeholder="自动带入或手动输入" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none font-mono" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">净重 (kg)</label>
-                    <input type="text" placeholder="请输入净重" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" placeholder="请输入净重" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">毛重 (kg)</label>
-                    <input type="text" placeholder="请输入毛重" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" placeholder="请输入毛重" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">第一计量单位</label>
-                    <input type="text" placeholder="自动带入或手动输入" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" placeholder="自动带入或手动输入" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">第一计量数量</label>
-                    <input type="text" placeholder="请输入数量" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" placeholder="请输入数量" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">常用单位</label>
-                    <input type="text" placeholder="自动带入或手动输入" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" placeholder="自动带入或手动输入" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">第二计量单位</label>
-                    <input type="text" placeholder="自动带入或手动输入" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" placeholder="自动带入或手动输入" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                   <div>
                     <label className="text-gray-500 block mb-1.5 text-sm">第二计量数量</label>
-                    <input type="text" placeholder="请输入数量" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                    <input type="text" placeholder="请输入数量" className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand/40 focus:ring-1 focus:ring-blue-500 outline-none" />
                   </div>
                 </div>
               </div>
@@ -1939,8 +2193,8 @@ export default function App() {
               {/* Section 3: SKU & Tax */}
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                 <div className="flex justify-between items-center mb-5">
-                  <h3 className="font-medium text-gray-800 border-l-4 border-blue-600 pl-3">SKU与税率配置</h3>
-                  <button className="text-blue-600 hover:underline text-sm flex items-center gap-1">
+                  <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">SKU与税率配置</h3>
+                  <button className="text-brand hover:underline text-sm flex items-center gap-1">
                     <Plus size={14} /> 添加SKU
                   </button>
                 </div>
@@ -1955,10 +2209,10 @@ export default function App() {
                   <tbody className="divide-y divide-gray-100">
                     <tr className="hover:bg-gray-50">
                       <td className="py-2 px-4">
-                        <input type="text" placeholder="例如: 默认规格" className="border border-gray-300 rounded px-2 py-1 text-sm w-full focus:border-blue-500 outline-none" />
+                        <input type="text" placeholder="例如: 默认规格" className="border border-gray-300 rounded px-2 py-1 text-sm w-full focus:border-brand/40 outline-none" />
                       </td>
                       <td className="py-2 px-4">
-                        <select className="border border-gray-300 rounded px-2 py-1 text-sm focus:border-blue-500 outline-none">
+                        <select className="border border-gray-300 rounded px-2 py-1 text-sm focus:border-brand/40 outline-none">
                           <option value="9.1%">9.1%</option>
                           <option value="23.1%">23.1%</option>
                         </select>
@@ -1995,41 +2249,41 @@ export default function App() {
               <div className="grid grid-cols-3 gap-6">
                 <div>
                   <label className="text-gray-500 block mb-1.5 text-sm">HS Code</label>
-                  <input type="text" defaultValue={filingModal.product.filingInfo.hsCode} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono" />
+                  <input type="text" defaultValue={filingModal.product.filingInfo.hsCode} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none font-mono" />
                 </div>
                 <div>
                   <label className="text-gray-500 block mb-1.5 text-sm">净重 (kg)</label>
-                  <input type="text" defaultValue={filingModal.product.filingInfo.netWeight} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                  <input type="text" defaultValue={filingModal.product.filingInfo.netWeight} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
                 </div>
                 <div>
                   <label className="text-gray-500 block mb-1.5 text-sm">毛重 (kg)</label>
-                  <input type="text" defaultValue={filingModal.product.filingInfo.grossWeight} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                  <input type="text" defaultValue={filingModal.product.filingInfo.grossWeight} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
                 </div>
                 <div>
                   <label className="text-gray-500 block mb-1.5 text-sm">第一计量单位</label>
-                  <input type="text" defaultValue={filingModal.product.filingInfo.unit1} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                  <input type="text" defaultValue={filingModal.product.filingInfo.unit1} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
                 </div>
                 <div>
                   <label className="text-gray-500 block mb-1.5 text-sm">第一计量数量</label>
-                  <input type="text" defaultValue={filingModal.product.filingInfo.qty1} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                  <input type="text" defaultValue={filingModal.product.filingInfo.qty1} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
                 </div>
                 <div>
                   <label className="text-gray-500 block mb-1.5 text-sm">常用单位</label>
-                  <input type="text" defaultValue={filingModal.product.filingInfo.commonUnit} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                  <input type="text" defaultValue={filingModal.product.filingInfo.commonUnit} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
                 </div>
                 <div>
                   <label className="text-gray-500 block mb-1.5 text-sm">第二计量单位</label>
-                  <input type="text" defaultValue={filingModal.product.filingInfo.unit2} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                  <input type="text" defaultValue={filingModal.product.filingInfo.unit2} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
                 </div>
                 <div>
                   <label className="text-gray-500 block mb-1.5 text-sm">第二计量数量</label>
-                  <input type="text" defaultValue={filingModal.product.filingInfo.qty2} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                  <input type="text" defaultValue={filingModal.product.filingInfo.qty2} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
                 </div>
               </div>
             </div>
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
               <button onClick={() => setFilingModal({isOpen: false, product: null})} className="px-5 py-2 text-sm text-gray-600 hover:bg-gray-200 rounded-md transition-colors font-medium">取消</button>
-              <button onClick={() => setFilingModal({isOpen: false, product: null})} className="px-5 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors font-medium shadow-sm flex items-center gap-2">
+              <button onClick={() => setFilingModal({isOpen: false, product: null})} className="px-5 py-2 text-sm bg-brand text-white hover:bg-brand-hover rounded-md transition-colors font-medium shadow-sm flex items-center gap-2">
                 <Save size={14} /> 保存并重新备案
               </button>
             </div>
@@ -2062,24 +2316,17 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="text-black font-medium block mb-3 text-sm">充值金额</label>
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    {[1000, 5000, 10000, 50000, 100000].map((amount) => (
-                      <button key={amount} className="border border-gray-200 rounded-md py-2 text-sm hover:border-brand hover:bg-gray-50 transition-colors">
-                        HKD {amount}
-                      </button>
-                    ))}
-                    <div className="relative">
-                       <input type="number" placeholder="其他金额" className="border border-gray-200 rounded-md py-2 px-3 text-sm focus:border-brand focus:ring-1 focus:ring-black outline-none w-full h-full" />
-                    </div>
+                  <label className="text-black font-medium block mb-3 text-sm">充值金额 <span className="text-brand">*</span></label>
+                  <div className="relative">
+                     <input type="number" placeholder="请输入充值总额 (港币)" className="border border-gray-300 rounded-md py-3 px-4 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none w-full transition-all" />
                   </div>
                 </div>
 
                 <div>
                   <label className="text-black font-medium block mb-3 text-sm">上传充值/调账凭证 <span className="text-brand">*</span></label>
                   <div className="border border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center text-center hover:bg-gray-50 transition-colors cursor-pointer bg-gray-50/50">
-                    <div className="bg-white border border-gray-200 text-black p-3 rounded-full mb-3 shadow-sm">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    <div className="bg-white border border-gray-200 text-black p-3 rounded-full mb-3 shadow-sm hover:border-brand transition-colors">
+                      <svg className="w-5 h-5 group-hover:text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                     </div>
                     <div className="text-black text-sm font-medium mb-1">点击或将对账水单拖拽到这里</div>
                     <div className="text-gray-400 text-xs">支持 JPG, PNG, PDF 格式</div>
@@ -2111,7 +2358,7 @@ export default function App() {
                   type="text" 
                   defaultValue={brandModal.brand?.name || ''} 
                   id="brandNameInput"
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-black outline-none transition-all" 
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all" 
                   placeholder="输入品牌名称" 
                 />
               </div>
@@ -2155,7 +2402,7 @@ export default function App() {
                   type="text" 
                   defaultValue={categoryModal.category?.name || ''} 
                   id="categoryNameInput"
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-black outline-none transition-all" 
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all" 
                   placeholder="输入分类名称" 
                 />
               </div>
@@ -2350,7 +2597,7 @@ export default function App() {
                       <div className="bg-white p-2 rounded border border-gray-300">
                         <div className="font-medium text-gray-800 text-xs">ROLEX 劳力士潜航者型系列</div>
                         <div className="text-gray-500 text-[10px] mt-0.5">SPU ID: SPU10029384</div>
-                        <button className="text-blue-600 hover:underline text-xs mt-1 block w-full text-left">
+                        <button className="text-brand hover:underline text-xs mt-1 block w-full text-left">
                           查看详情并比对
                         </button>
                       </div>
@@ -2606,6 +2853,102 @@ export default function App() {
                 </div>
              </div>
           </div>
+        </div>
+      )}
+
+      {/* Customs Wechat Config Modal */}
+      {customsWechatConfigModal && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center animate-in fade-in duration-200">
+           <div className="bg-white rounded-lg shadow-xl w-[600px] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="flex justify-between items-center p-5 border-b border-gray-100">
+                 <h3 className="text-lg font-semibold">微信报关配置</h3>
+                 <button onClick={() => setCustomsWechatConfigModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={20} /></button>
+              </div>
+              <div className="p-6 overflow-y-auto" style={{maxHeight: '70vh'}}>
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">微信公众号appid:</label>
+                    <input type="text" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">微信支付商户号:</label>
+                    <input type="text" defaultValue="1681958226" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">API密钥key:</label>
+                    <input type="password" defaultValue="Shanghai123..." className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">海关电商编号:</label>
+                    <input type="text" defaultValue="3117960D7V" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">默认申报口岸代码:</label>
+                    <input type="text" defaultValue="NINGBO" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-gray-100 p-5 flex justify-end gap-3 bg-gray-50/50">
+                 <button onClick={() => setCustomsWechatConfigModal(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors">取消</button>
+                 <button onClick={() => setCustomsWechatConfigModal(false)} className="px-4 py-2 bg-brand text-white rounded text-sm hover:bg-brand-hover transition-colors">确定</button>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* Customs SF Config Modal */}
+      {customsSFConfigModal && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center animate-in fade-in duration-200">
+           <div className="bg-white rounded-lg shadow-xl w-[600px] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="flex justify-between items-center p-5 border-b border-gray-100">
+                 <h3 className="text-lg font-semibold">顺丰直邮报关配置</h3>
+                 <button onClick={() => setCustomsSFConfigModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={20} /></button>
+              </div>
+              <div className="p-6 overflow-y-auto" style={{maxHeight: '70vh'}}>
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">appKey:</label>
+                    <input type="text" defaultValue="33B64944FF6ba1710dc59290d3350e02" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">appSecret:</label>
+                    <input type="password" defaultValue="0103c12cd3c5ddca3790693d1bc6b571" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">aesKey:</label>
+                    <input type="password" defaultValue="CTUCJ78Q4534g3T4g25K12" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">apiUsername:</label>
+                    <input type="text" defaultValue="LUXEPORTER" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">客户编码:</label>
+                    <input type="text" defaultValue="ICRM005J8H70" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">国际产品映射码:</label>
+                    <input type="text" defaultValue="INT0009" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">月结卡号:</label>
+                    <input type="text" defaultValue="853298735" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">电商平台名称:</label>
+                    <input type="text" defaultValue="上海斐宁唯选供应链有限公司" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className="w-32 text-right text-sm text-gray-700">电商平台编号:</label>
+                    <input type="text" defaultValue="3117960D7V" className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40" />
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-gray-100 p-5 flex justify-end gap-3 bg-gray-50/50">
+                 <button onClick={() => setCustomsSFConfigModal(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors">取消</button>
+                 <button onClick={() => setCustomsSFConfigModal(false)} className="px-4 py-2 bg-brand text-white rounded text-sm hover:bg-brand-hover transition-colors">确定</button>
+              </div>
+           </div>
         </div>
       )}
     </div>
