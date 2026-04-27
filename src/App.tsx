@@ -249,7 +249,7 @@ export default function App() {
       title: '清关系统',
       items: [
         { id: 'customs-config', icon: Building2, label: '企业配置' },
-        { id: 'customs-products', icon: Box, label: '商品备案信息' },
+        { id: 'customs-products', icon: Box, label: '商品海关备案' },
         { id: 'customs-orders', icon: Plane, label: '订单清关信息' }
       ]
     },
@@ -1096,67 +1096,91 @@ export default function App() {
 
       {fundsTab === 'orders' && (
         <div className="flex-1 flex flex-col animate-in fade-in">
-          <div className="bg-brand-light/20 border-l-4 border-brand/40 p-3 rounded-r text-sm text-gray-700 mb-6">
-            <span className="font-medium">核算公式：</span> 应收金额 = 用户实付 - 跨境支付手续费 | 销售毛利 = 应收金额 - 商品成本 - 税费 - 运费。
-          </div>
-
           <div className="flex justify-between items-center mb-4">
-            <div className="flex gap-3">
-              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-64 focus:outline-none focus:border-emerald-500" placeholder="订单号/分销店名称" />
-              <div className="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white">
-                <input type="text" className="px-3 py-1.5 text-sm w-32 focus:outline-none" placeholder="开始日期" />
-                <span className="text-gray-400 px-2">至</span>
-                <input type="text" className="px-3 py-1.5 text-sm w-32 focus:outline-none" placeholder="结束日期" />
-              </div>
+            <div className="flex gap-3 flex-wrap">
+              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-40 focus:outline-none focus:border-brand/40" placeholder="商家名称/ID" />
+              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-40 focus:outline-none focus:border-brand/40" placeholder="订单号" />
+              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-40 focus:outline-none focus:border-brand/40" placeholder="支付单号" />
+              <select className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-brand/40 text-gray-600">
+                <option value="">订单状态</option>
+                <option value="paid">已支付</option>
+                <option value="clearing">清关中</option>
+                <option value="shipped">已发货</option>
+                <option value="completed">交易完成</option>
+                <option value="closed">交易关闭</option>
+              </select>
+              <select className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-brand/40 text-gray-600">
+                <option value="">支付方式</option>
+                <option value="intl">国际支付</option>
+                <option value="domestic">国内支付</option>
+              </select>
               <button className="bg-brand hover:bg-brand-hover text-white px-5 py-1.5 rounded-md text-sm transition-colors">
                 查询
               </button>
             </div>
-            <button className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1.5 rounded-md text-sm transition-colors shadow-sm">
+            <button className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1.5 rounded-md text-sm transition-colors shadow-sm whitespace-nowrap">
               批量导出流水
             </button>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex-1">
-            <table className="w-full text-left text-sm">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto flex-1">
+            <table className="w-full text-left text-sm min-w-max">
               <thead className="bg-gray-50 border-b border-gray-200 text-gray-600">
                 <tr>
-                  <th className="py-3 px-4 font-medium">订单/分销店铺归属</th>
-                  <th className="py-3 px-4 font-medium">创建时间</th>
+                  <th className="py-3 px-4 font-medium">订单号 / 支付单号</th>
+                  <th className="py-3 px-4 font-medium">销售商家</th>
                   <th className="py-3 px-4 font-medium">交易状态</th>
-                  <th className="py-3 px-4 font-medium">实付金额</th>
-                  <th className="py-3 px-4 font-medium">跨境支付手续费</th>
-                  <th className="py-3 px-4 font-medium">应收金额</th>
-                  <th className="py-3 px-4 font-medium">商品成本</th>
-                  <th className="py-3 px-4 font-medium">税费/运费</th>
-                  <th className="py-3 px-4 font-medium">销售毛利</th>
+                  <th className="py-3 px-4 font-medium">实付金额 / 支付方式</th>
+                  <th className="py-3 px-4 font-medium">扣除项 (手续费/税费/运费)</th>
+                  <th className="py-3 px-4 font-medium">分账标识</th>
+                  <th className="py-3 px-4 font-medium">货主定扎明细</th>
+                  <th className="py-3 px-4 font-medium">分佣方明细</th>
                   <th className="py-3 px-4 font-medium text-right">操作</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {[
-                  { id: '1023202602081419229836959', store: '1023 - 万选奢品全球购', time: '2026-02-08 14:19:23', status: '待平台发货', paid: '602.23', fee: '-7.38', receivable: '484.62', cost: '--', tax: '50.23 / 60', profit: '--' },
-                  { id: '1023202602042111513455755', store: '1023 - 万选奢品全球购', time: '2026-02-04 21:11:52', status: '待平台发货', paid: '223.66', fee: '-2.47', receivable: '162.53', cost: '--', tax: '18.66 / 40', profit: '--' },
-                  { id: '1023202602041657403938234', store: '1023 - 万选奢品全球购', time: '2026-02-04 16:57:41', status: '交易关闭', paid: '223.66', fee: '0.00', receivable: '0.00', cost: '--', tax: '18.66 / 40', profit: '--' },
-                  { id: '1023202602021616027932475', store: '1023 - 万选奢品全球购', time: '2026-02-02 16:16:03', status: '已收货', paid: '224.75', fee: '-2.49', receivable: '163.51', cost: '--', tax: '18.75 / 40', profit: '--' },
+                  { orderId: 'OD20240419113', payId: 'P20240419113941', store: '1014 - 万选文旅', status: '待发货', progress: '已清关', total: 'HKD 1,485.50', payType: '国际支付', fee: 'HKD 14.85', tax: 'HKD 54.00', shipping: 'HKD 45.00', hasSplit: true, owner: '万选文旅', ownerAmt: 'HKD 1,221.65', broker: '平台分佣', brokerAmt: 'HKD 150.00' },
+                  { orderId: 'OD20240418214', payId: 'P20240418104845', store: '2055 - HANNAH加盟店', status: '已完成', progress: '已完成', total: 'CNY 714.61', payType: '国内支付', fee: 'CNY 4.28', tax: 'CNY 65.00', shipping: 'CNY 15.00', hasSplit: true, owner: '万选文旅', ownerAmt: 'CNY 500.00', broker: 'HANNAH加盟店', brokerAmt: 'CNY 130.33' },
+                  { orderId: 'OD20240417101', payId: 'P20240415951662', store: '1018 - 中出服免税', status: '交易关闭', progress: '主动取消', total: 'CNY 310.94', payType: '国内支付', fee: 'CNY 0.00', tax: 'CNY 0.00', shipping: 'CNY 0.00', hasSplit: false, owner: '--', ownerAmt: '--', broker: '--', brokerAmt: '--' },
+                  { orderId: 'OD20240414166', payId: 'P20240416481294', store: '1014 - 万选文旅', status: '已发货', progress: '运输中', total: 'HKD 992.13', payType: '国际支付', fee: 'HKD 9.92', tax: 'HKD 90.50', shipping: 'HKD 45.00', hasSplit: true, owner: '万选文旅', ownerAmt: 'HKD 846.71', broker: '--', brokerAmt: '--' },
                 ].map((row, idx) => (
                   <tr key={idx} className="hover:bg-gray-50 transition-colors">
                     <td className="py-3 px-4">
-                      <div className="text-brand font-medium hover:underline cursor-pointer">{row.store}</div>
-                      <div className="text-gray-400 text-xs font-mono">{row.id}</div>
+                      <div className="font-mono text-gray-800">{row.orderId}</div>
+                      <div className="text-gray-400 text-xs font-mono">P: {row.payId}</div>
                     </td>
-                    <td className="py-3 px-4 text-gray-500 text-xs">{row.time.split(' ')[0]}<br/>{row.time.split(' ')[1]}</td>
                     <td className="py-3 px-4">
-                      <span className={row.status === '交易关闭' ? 'text-gray-500' : 'text-brand'}>{row.status}</span>
+                      <div className="text-brand font-medium cursor-pointer hover:underline">{row.store}</div>
                     </td>
-                    <td className="py-3 px-4 text-gray-700 font-medium">{row.paid}</td>
-                    <td className="py-3 px-4 text-orange-500">{row.fee}</td>
-                    <td className="py-3 px-4 font-medium text-gray-800">{row.receivable}</td>
-                    <td className="py-3 px-4 text-gray-500">{row.cost}</td>
-                    <td className="py-3 px-4 text-gray-600">{row.tax}</td>
-                    <td className="py-3 px-4 text-gray-500">{row.profit}</td>
+                    <td className="py-3 px-4">
+                      <div className={row.status === '交易关闭' ? 'text-gray-500' : 'text-gray-800'}>{row.status}</div>
+                      <div className="text-xs text-gray-500">{row.progress}</div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="font-medium text-gray-800">{row.total}</div>
+                      <Tag color={row.payType === '国际支付' ? 'blue' : 'green'}>{row.payType}</Tag>
+                    </td>
+                    <td className="py-3 px-4 text-xs">
+                      <div className="grid grid-cols-[50px_1fr] gap-x-2">
+                        <span className="text-gray-500 text-right">手续费:</span><span className="text-red-500 font-mono">-{row.fee}</span>
+                        <span className="text-gray-500 text-right">税费:</span><span className="text-orange-500 font-mono">-{row.tax}</span>
+                        <span className="text-gray-500 text-right">运费:</span><span className="text-blue-500 font-mono">-{row.shipping}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      {row.hasSplit ? <Tag color="green">已分账</Tag> : <span className="text-gray-400 text-xs">未分账</span>}
+                    </td>
+                    <td className="py-3 px-4">
+                       <div className="text-gray-700 font-medium">{row.owner}</div>
+                       <div className="text-xs font-mono text-gray-500">{row.ownerAmt}</div>
+                    </td>
+                    <td className="py-3 px-4">
+                       <div className="text-gray-700 font-medium">{row.broker}</div>
+                       <div className="text-xs font-mono text-gray-500">{row.brokerAmt}</div>
+                    </td>
                     <td className="py-3 px-4 text-right">
-                      <button className="text-gray-500 hover:text-gray-700 text-xs">资金池轧差</button>
+                      <button className="text-brand hover:text-brand-hover hover:underline text-sm font-medium">详情</button>
                     </td>
                   </tr>
                 ))}
@@ -1300,7 +1324,7 @@ export default function App() {
     return (
       <div className="animate-in fade-in duration-300 h-full flex flex-col">
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex flex-col gap-3 shrink-0">
-          <h2 className="text-xl font-semibold text-gray-800">商品列表</h2>
+          <h2 className="text-xl font-semibold text-gray-800">商品海关备案</h2>
         </div>
         <div className="flex-1 p-6 overflow-y-auto bg-gray-50">
           <div className="bg-white p-5 rounded-sm shadow-sm border border-gray-200 mb-4 flex justify-between items-center">
