@@ -191,7 +191,8 @@ export default function App() {
   
   // Sub-navigation states
   const [publicLibTab, setPublicLibTab] = useState('products'); // products, brands, categories
-  const [filingTab, setFilingTab] = useState('category'); // category, product, new-application
+  const [filingTab, setFilingTab] = useState('category'); // category, product
+  const [productFilingTab, setProductFilingTab] = useState<'merchant' | 'public'>('merchant');
   
   // Modal States
   const [detailDrawer, setDetailDrawer] = useState<{isOpen: boolean, merchant: any, activeTab: string}>({isOpen: false, merchant: null, activeTab: 'basic'});
@@ -228,6 +229,12 @@ export default function App() {
   const [customsWechatConfigModal, setCustomsWechatConfigModal] = useState(false);
   const [customsSFConfigModal, setCustomsSFConfigModal] = useState(false);
 
+  // Fallback SKU States
+  const [fallbackSkuDrawer, setFallbackSkuDrawer] = useState<{isOpen: boolean, category: any}>({isOpen: false, category: null});
+  const [fallbackSkuRules, setFallbackSkuRules] = useState<any[]>([
+    { id: '1', categoryId: 'C0011', brand: 'MONCLER', gender: '男', mappings: [{ from: 'EU36', to: '36' }, { from: '5', to: 'UK5' }] }
+  ]);
+
   // Navigation Items
   const navGroups = [
     {
@@ -241,7 +248,7 @@ export default function App() {
       title: '商品与业务',
       items: [
         { id: 'public-products', icon: Boxes, label: '公共商品库' },
-        { id: 'hscode', icon: BookOpen, label: '公共备案与HSCode' },
+        { id: 'hscode', icon: BookOpen, label: '商品备案' },
         { id: 'mapping', icon: GitMerge, label: '商家分类映射' },
       ]
     },
@@ -727,6 +734,7 @@ export default function App() {
                           )}
                         </td>
                         <td className="py-3 px-6 text-right space-x-3">
+                          <button onClick={() => setFallbackSkuDrawer({isOpen: true, category: child})} className="text-brand hover:underline font-medium">兜底SKU</button>
                           <button onClick={() => setCategoryModal({isOpen: true, category: child, parentId: cat.id})} className="text-brand hover:underline font-medium">编辑</button>
                           <button onClick={() => setMigrateModal({isOpen: true, source: child, type: 'category'})} className="text-brand hover:underline font-medium">迁移SPU</button>
                           {child.spuCount === 0 ? (
@@ -761,15 +769,15 @@ export default function App() {
   const renderHSCodeView = () => (
     <div className="animate-in fade-in duration-300 h-full flex flex-col p-6">
       <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-800">公共备案与HSCode</h2>
+        <h2 className="text-xl font-semibold text-gray-800">商品备案</h2>
       </div>
 
       <div className="flex gap-6 border-b border-gray-200 mb-6">
         <button onClick={() => setFilingTab('category')} className={`pb-3 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${filingTab === 'category' ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-black'}`}>
-          <BookOpen size={16} /> 分类默认备案规则
+          <BookOpen size={16} /> 分类备案
         </button>
         <button onClick={() => setFilingTab('product')} className={`pb-3 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${filingTab === 'product' ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-black'}`}>
-          <FileText size={16} /> 指定商品备案维护
+          <FileText size={16} /> 指定商品备案
         </button>
       </div>
 
@@ -846,42 +854,65 @@ export default function App() {
       )}
 
       {filingTab === 'product' && (
-        <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden animate-in fade-in">
-           <div className="p-4 border-b border-gray-200 flex gap-4 items-center bg-gray-50/50">
-              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-brand/40" placeholder="商家 ID" />
-              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-64 focus:outline-none focus:border-brand/40" placeholder="输入 SPU 货号查询" />
-              <button className="bg-brand hover:bg-brand text-white px-5 py-1.5 rounded-md text-sm transition-colors">查询</button>
-           </div>
-           <div className="flex-1 overflow-auto">
-             <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 sticky top-0">
-                  <tr>
-                    <th className="py-3 px-6 font-medium">标准货号</th>
-                    <th className="py-3 px-4 font-medium">商品名称</th>
-                    <th className="py-3 px-4 font-medium">商家 ID</th>
-                    <th className="py-3 px-4 font-medium">特定 HS Code</th>
-                    <th className="py-3 px-4 font-medium">备案状态</th>
-                    <th className="py-3 px-6 font-medium text-right">操作</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {mockProducts.map(prod => (
-                    <tr key={prod.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-6 font-mono text-gray-600">{prod.id}</td>
-                      <td className="py-4 px-4 text-gray-800">{prod.name}</td>
-                      <td className="py-4 px-4 font-mono text-gray-500">1567</td>
-                      <td className="py-4 px-4"><span className="font-mono text-brand">{prod.filingInfo.hsCode}</span></td>
-                      <td className="py-4 px-4">
-                        <Tag color={prod.filingInfo.status === '已备案' ? 'green' : 'orange'}>{prod.filingInfo.status}</Tag>
-                      </td>
-                      <td className="py-4 px-6 text-right space-x-3">
-                        <button onClick={() => setFilingModal({isOpen: true, product: prod})} className="text-brand hover:text-brand font-medium">修改备案</button>
-                      </td>
+        <div className="flex-1 flex flex-col min-h-0 animate-in fade-in">
+          <div className="flex gap-4 mb-4">
+            <button 
+              onClick={() => setProductFilingTab('merchant')} 
+              className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${productFilingTab === 'merchant' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'}`}
+            >
+              商家商品
+            </button>
+            <button 
+              onClick={() => setProductFilingTab('public')} 
+              className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${productFilingTab === 'public' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'}`}
+            >
+              公共库商品
+            </button>
+          </div>
+
+          <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden">
+             <div className="p-4 border-b border-gray-200 flex gap-4 items-center bg-gray-50/50">
+                {productFilingTab === 'merchant' && (
+                  <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-brand/40" placeholder="商家 ID" />
+                )}
+                <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-64 focus:outline-none focus:border-brand/40" placeholder="输入 SPU 货号查询" />
+                <button className="bg-brand hover:bg-brand-hover text-white px-5 py-1.5 rounded-md text-sm transition-colors">查询</button>
+             </div>
+             <div className="flex-1 overflow-auto">
+               <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
+                  <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 sticky top-0">
+                    <tr>
+                      <th className="py-3 px-6 font-medium">标准货号</th>
+                      <th className="py-3 px-4 font-medium">商品名称</th>
+                      {productFilingTab === 'merchant' && (
+                        <th className="py-3 px-4 font-medium">商家 ID</th>
+                      )}
+                      <th className="py-3 px-4 font-medium">特定 HS Code</th>
+                      <th className="py-3 px-4 font-medium">备案状态</th>
+                      <th className="py-3 px-6 font-medium text-right">操作</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-           </div>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {mockProducts.map(prod => (
+                      <tr key={prod.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="py-4 px-6 font-mono text-gray-600">{prod.id}</td>
+                        <td className="py-4 px-4 text-gray-800">{prod.name}</td>
+                        {productFilingTab === 'merchant' && (
+                          <td className="py-4 px-4 font-mono text-gray-500">1567</td>
+                        )}
+                        <td className="py-4 px-4"><span className="font-mono text-brand">{prod.filingInfo.hsCode}</span></td>
+                        <td className="py-4 px-4">
+                          <Tag color={prod.filingInfo.status === '已备案' ? 'green' : 'orange'}>{prod.filingInfo.status}</Tag>
+                        </td>
+                        <td className="py-4 px-6 text-right space-x-3">
+                          <button onClick={() => setFilingModal({isOpen: true, product: prod})} className="text-brand hover:underline font-medium">修改备案</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+             </div>
+          </div>
         </div>
       )}
     </div>
@@ -2973,6 +3004,137 @@ export default function App() {
                  <button onClick={() => setCustomsSFConfigModal(false)} className="px-4 py-2 bg-brand text-white rounded text-sm hover:bg-brand-hover transition-colors">确定</button>
               </div>
            </div>
+        </div>
+      )}
+
+      {/* Fallback SKU Drawer */}
+      {fallbackSkuDrawer.isOpen && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex justify-end animate-in fade-in duration-200">
+          <div className="bg-white w-[600px] h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">兜底 SKU 规格设置</h3>
+                <div className="text-sm text-gray-500 mt-1">分类: <span className="font-medium text-gray-700">{fallbackSkuDrawer.category?.name}</span></div>
+              </div>
+              <button onClick={() => setFallbackSkuDrawer({isOpen: false, category: null})} className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 bg-gray-50/30">
+              <div className="flex justify-between items-center">
+                <h4 className="font-medium text-gray-800">匹配规则列表</h4>
+                <button 
+                  onClick={() => setFallbackSkuRules([...fallbackSkuRules, { id: Date.now().toString(), categoryId: fallbackSkuDrawer.category?.id, brand: '', gender: '无', mappings: [] }])}
+                  className="text-sm bg-brand text-white px-3 py-1.5 rounded hover:bg-brand-hover transition-colors flex items-center gap-1"
+                >
+                  <Plus size={14} /> 新增规则
+                </button>
+              </div>
+
+              {fallbackSkuRules.filter(r => r.categoryId === fallbackSkuDrawer.category?.id).length === 0 ? (
+                <div className="text-center py-10 text-gray-400 bg-white rounded-lg border border-dashed border-gray-200">暂无兜底匹配规则</div>
+              ) : (
+                fallbackSkuRules.filter(r => r.categoryId === fallbackSkuDrawer.category?.id).map((rule, index) => (
+                  <div key={rule.id} className="bg-white border text-sm border-gray-200 rounded-lg shadow-sm overflow-hidden relative">
+                    <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex gap-4 items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500">品牌:</span>
+                        <input type="text" value={rule.brand} onChange={(e) => {
+                          const newRules = [...fallbackSkuRules];
+                          const idx = newRules.findIndex(r => r.id === rule.id);
+                          newRules[idx].brand = e.target.value;
+                          setFallbackSkuRules(newRules);
+                        }} className="border border-gray-300 rounded px-2 py-1 outline-none focus:border-brand w-32" placeholder="如 MONCLER" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500">性别:</span>
+                        <select value={rule.gender} onChange={(e) => {
+                          const newRules = [...fallbackSkuRules];
+                          const idx = newRules.findIndex(r => r.id === rule.id);
+                          newRules[idx].gender = e.target.value;
+                          setFallbackSkuRules(newRules);
+                        }} className="border border-gray-300 rounded px-2 py-1 outline-none focus:border-brand text-gray-700">
+                          <option value="男">男</option>
+                          <option value="女">女</option>
+                          <option value="儿童">儿童</option>
+                          <option value="无">无</option>
+                        </select>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setFallbackSkuRules(fallbackSkuRules.filter(r => r.id !== rule.id));
+                        }}
+                        className="ml-auto text-red-500 hover:text-red-600 px-2 text-xs"
+                      >
+                        删除规则
+                      </button>
+                    </div>
+                    
+                    <div className="p-4 flex flex-col gap-3">
+                      <div className="flex justify-between items-center text-xs text-gray-500">
+                        <span>字符映射配置 (例如: 将商品SKU的EU36映射为标准尺寸36)</span>
+                        <button 
+                          onClick={() => {
+                            const newRules = [...fallbackSkuRules];
+                            const idx = newRules.findIndex(r => r.id === rule.id);
+                            newRules[idx].mappings.push({ from: '', to: '' });
+                            setFallbackSkuRules(newRules);
+                          }}
+                          className="text-brand hover:underline font-medium"
+                        >+ 添加映射</button>
+                      </div>
+                      
+                      {rule.mappings.length === 0 ? (
+                        <div className="text-gray-400 text-xs italic py-2">暂无映射</div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-3">
+                          {rule.mappings.map((mapping: any, mIdx: number) => (
+                            <div key={mIdx} className="flex gap-2 items-center bg-gray-50 p-2 rounded border border-gray-100">
+                              <input type="text" value={mapping.from} onChange={(e) => {
+                                const newRules = [...fallbackSkuRules];
+                                const rIdx = newRules.findIndex(r => r.id === rule.id);
+                                newRules[rIdx].mappings[mIdx].from = e.target.value;
+                                setFallbackSkuRules(newRules);
+                              }} className="w-16 border border-gray-300 rounded px-2 py-1 text-xs outline-none focus:border-brand text-center" placeholder="EU36" />
+                              <div className="text-gray-400">→</div>
+                              <input type="text" value={mapping.to} onChange={(e) => {
+                                const newRules = [...fallbackSkuRules];
+                                const rIdx = newRules.findIndex(r => r.id === rule.id);
+                                newRules[rIdx].mappings[mIdx].to = e.target.value;
+                                setFallbackSkuRules(newRules);
+                              }} className="w-16 border border-gray-300 rounded px-2 py-1 text-xs outline-none focus:border-brand text-center bg-white" placeholder="36" />
+                              <button onClick={() => {
+                                const newRules = [...fallbackSkuRules];
+                                const rIdx = newRules.findIndex(r => r.id === rule.id);
+                                newRules[rIdx].mappings = newRules[rIdx].mappings.filter((_: any, i: number) => i !== mIdx);
+                                setFallbackSkuRules(newRules);
+                              }} className="text-gray-400 hover:text-red-500 ml-auto"><X size={14}/></button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            
+            <div className="p-5 border-t border-gray-100 bg-white flex justify-end gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+              <button 
+                onClick={() => setFallbackSkuDrawer({isOpen: false, category: null})}
+                className="px-5 py-2 text-sm font-medium border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                关闭
+              </button>
+              <button 
+                onClick={() => setFallbackSkuDrawer({isOpen: false, category: null})}
+                className="px-5 py-2 text-sm font-medium bg-brand text-white rounded-md hover:bg-brand-hover transition-colors shadow-sm"
+              >
+                保存规则
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
