@@ -24,7 +24,24 @@ import {
   Filter,
   Building2,
   Box,
-  Plane
+  Plane,
+  Receipt,
+  Wallet,
+  Coins,
+  Upload,
+  Download,
+  ArrowLeft,
+  ArrowRight,
+  Calendar,
+  FileSpreadsheet,
+  CheckCircle2,
+  AlertCircle,
+  RefreshCw,
+  DollarSign,
+  History,
+  Truck,
+  ArrowDownRight,
+  ArrowUpRight
 } from 'lucide-react';
 
 // --- Mock Data ---
@@ -67,6 +84,199 @@ const mockMerchants = [
     filing: { customsCode: '312298002', port: '海南' },
     children: []
   }
+];
+
+// --- SF & Service Account Mock Data ---
+const initialSfWaybillBills = [
+  {
+    id: 'SFB20260718001',
+    merchantId: '1014',
+    merchantName: '万选文旅',
+    orderId: 'OD20240419113',
+    payId: 'P20240419113941',
+    waybillNo: 'SF168800928311',
+    billingMonth: '2026-07',
+    shipDate: '2026-07-18 10:22',
+    customsPort: '宁波海关 (BC直邮)',
+    tax: 54.00,
+    freight: 45.00,
+    totalCost: 99.00,
+    status: '已结清',
+    deductSource: '服务账户余额',
+    notes: '自动预扣扣减成功'
+  },
+  {
+    id: 'SFB20260718002',
+    merchantId: '1014',
+    merchantName: '万选文旅',
+    orderId: 'OD20240414166',
+    payId: 'P20240416481294',
+    waybillNo: 'SF168800928312',
+    billingMonth: '2026-07',
+    shipDate: '2026-07-17 14:10',
+    customsPort: '宁波海关 (BC直邮)',
+    tax: 90.50,
+    freight: 45.00,
+    totalCost: 135.50,
+    status: '已结清',
+    deductSource: '服务账户余额',
+    notes: '自动预扣扣减成功'
+  },
+  {
+    id: 'SFB20260718003',
+    merchantId: '1014',
+    merchantName: '万选文旅',
+    orderId: 'OD20240416990',
+    payId: 'P20240416990111',
+    waybillNo: 'SF168800928313',
+    billingMonth: '2026-07',
+    shipDate: '2026-07-15 16:05',
+    customsPort: '广州白云 (BBC保税)',
+    tax: 120.00,
+    freight: 55.00,
+    totalCost: 175.00,
+    status: '已结清',
+    deductSource: '服务账户余额',
+    notes: '正常月结扣款'
+  },
+  {
+    id: 'SFB20260718004',
+    merchantId: '2055',
+    merchantName: 'HANNAH加盟店',
+    orderId: 'OD20240418214',
+    payId: 'P20240418104845',
+    waybillNo: 'SF168800928401',
+    billingMonth: '2026-07',
+    shipDate: '2026-07-16 11:30',
+    customsPort: '上海浦东 (BC直邮)',
+    tax: 65.00,
+    freight: 15.00,
+    totalCost: 80.00,
+    status: '已结清',
+    deductSource: '商家预扣款',
+    notes: '关联服务商统一代扣'
+  },
+  {
+    id: 'SFB20260718005',
+    merchantId: '2055',
+    merchantName: 'HANNAH加盟店',
+    orderId: 'OD20240418300',
+    payId: 'P20240418105000',
+    waybillNo: 'SF168800928402',
+    billingMonth: '2026-07',
+    shipDate: '2026-07-14 09:45',
+    customsPort: '上海浦东 (BC直邮)',
+    tax: 110.00,
+    freight: 25.00,
+    totalCost: 135.00,
+    status: '待补缴',
+    deductSource: '服务账户余额',
+    notes: '账户余额不足，待补扣关费运费'
+  },
+  {
+    id: 'SFB20260718006',
+    merchantId: '1018',
+    merchantName: '中出服免税',
+    orderId: 'OD20240417101',
+    payId: 'P20240415951662',
+    waybillNo: 'SF168800928505',
+    billingMonth: '2026-07',
+    shipDate: '2026-07-12 15:20',
+    customsPort: '北京首都 (BC直邮)',
+    tax: 210.00,
+    freight: 60.00,
+    totalCost: 270.00,
+    status: '已结清',
+    deductSource: '服务账户余额',
+    notes: '预存抵扣成功'
+  },
+  {
+    id: 'SFB20260718007',
+    merchantId: '2033',
+    merchantName: '极速奢品',
+    orderId: 'OD20240419888',
+    payId: 'P20240419888000',
+    waybillNo: 'SF168800928601',
+    billingMonth: '2026-07',
+    shipDate: '2026-07-19 18:00',
+    customsPort: '深圳宝安 (BC直邮)',
+    tax: 320.00,
+    freight: 80.00,
+    totalCost: 400.00,
+    status: '已结清',
+    deductSource: '手动对冲',
+    notes: '顺丰月度对账核算结算'
+  }
+];
+
+const initialServiceAccounts = [
+  {
+    merchantId: '1014',
+    merchantName: '万选文旅',
+    role: '服务商' as const,
+    billingMonth: '2026-07',
+    taxPayable: 264.50,
+    freightPayable: 145.00,
+    totalPayable: 409.50,
+    preDeducted: 409.50,
+    unsettledAmount: 0.00,
+    accountBalance: 12500.00,
+    currency: 'HKD' as const,
+    status: '已结清' as const,
+    lastUpdated: '2026-07-26 18:30'
+  },
+  {
+    merchantId: '2055',
+    merchantName: 'HANNAH加盟店',
+    role: '主理人' as const,
+    billingMonth: '2026-07',
+    taxPayable: 175.00,
+    freightPayable: 40.00,
+    totalPayable: 215.00,
+    preDeducted: 80.00,
+    unsettledAmount: 135.00,
+    accountBalance: 0.00,
+    currency: 'HKD' as const,
+    status: '待补缴' as const,
+    lastUpdated: '2026-07-26 15:10'
+  },
+  {
+    merchantId: '1018',
+    merchantName: '中出服免税',
+    role: '服务商' as const,
+    billingMonth: '2026-07',
+    taxPayable: 210.00,
+    freightPayable: 60.00,
+    totalPayable: 270.00,
+    preDeducted: 270.00,
+    unsettledAmount: 0.00,
+    accountBalance: 88000.00,
+    currency: 'HKD' as const,
+    status: '已结清' as const,
+    lastUpdated: '2026-07-25 10:00'
+  },
+  {
+    merchantId: '2033',
+    merchantName: '极速奢品',
+    role: '主理人' as const,
+    billingMonth: '2026-07',
+    taxPayable: 320.00,
+    freightPayable: 80.00,
+    totalPayable: 400.00,
+    preDeducted: 400.00,
+    unsettledAmount: 0.00,
+    accountBalance: 3200.00,
+    currency: 'HKD' as const,
+    status: '已结清' as const,
+    lastUpdated: '2026-07-24 14:00'
+  }
+];
+
+const initialJournals = [
+  { id: 'TXN20260726001', merchantId: '1014', merchantName: '万选文旅', type: '充值', amount: 5000.00, currency: 'HKD', time: '2026-07-26 10:30:00', operator: 'admin', remark: '商家预存关运费备用金', balanceAfter: 12500.00 },
+  { id: 'TXN20260725002', merchantId: '2055', merchantName: 'HANNAH加盟店', type: '抵扣关运费', amount: -80.00, currency: 'CNY', time: '2026-07-25 15:45:22', operator: 'system', remark: '顺丰月度账单(SF168800928401)自动预扣关运费', balanceAfter: 0.00 },
+  { id: 'TXN20260724003', merchantId: '1018', merchantName: '中出服免税', type: '充值', amount: 10000.00, currency: 'HKD', time: '2026-07-24 09:15:00', operator: 'admin', remark: '跨境物流保证金充值', balanceAfter: 88000.00 },
+  { id: 'TXN20260720004', merchantId: '1014', merchantName: '万选文旅', type: '抵扣关运费', amount: -409.50, currency: 'CNY', time: '2026-07-20 11:00:00', operator: 'system', remark: '顺丰7月核算对账全额扣抵', balanceAfter: 12500.00 }
 ];
 
 const mockMiniPrograms = [
@@ -193,17 +403,325 @@ export default function App() {
   const [publicLibTab, setPublicLibTab] = useState('products'); // products, brands, categories
   const [filingTab, setFilingTab] = useState('category'); // category, product
   const [productFilingTab, setProductFilingTab] = useState<'merchant' | 'public'>('merchant');
+  const [categoryFilingTab, setCategoryFilingTab] = useState<'public' | 'merchant'>('public');
   
+  // Merchant Master Data State
+  const [merchants, setMerchants] = useState(mockMerchants);
+
   // Modal States
   const [detailDrawer, setDetailDrawer] = useState<{isOpen: boolean, merchant: any, activeTab: string}>({isOpen: false, merchant: null, activeTab: 'basic'});
   const [addModal, setAddModal] = useState<{isOpen: boolean, type: 'provider' | 'sub', parentId?: string}>({isOpen: false, type: 'provider'});
   const [isEditingMerchant, setIsEditingMerchant] = useState(false);
+
+  // --- Service Account & Financial States ---
+  const [sfBills, setSfBills] = useState(initialSfWaybillBills);
+  const [serviceAccounts, setServiceAccounts] = useState(initialServiceAccounts);
+  const [accountJournals, setAccountJournals] = useState(initialJournals);
+
+  // SF Bill Import Modal State
+  const [importSfModalOpen, setImportSfModalOpen] = useState(false);
+  const [sfImportMonth, setSfImportMonth] = useState('2026-07');
+  const [sfImportStep, setSfImportStep] = useState<'upload' | 'preview'>('upload');
+  const [importedFileName, setImportedFileName] = useState('顺丰2026年07月报关关税及运费月度对账表.xlsx');
+
+  // Service Account Drilldown & Query States
+  const [selectedMerchantDetail, setSelectedMerchantDetail] = useState<any | null>(null);
+  const [sfMerchantSearch, setSfMerchantSearch] = useState('');
+  const [sfBillingMonthSelect, setSfBillingMonthSelect] = useState('2026-07');
+  const [sfOrderQuery, setSfOrderQuery] = useState('');
+  const [sfWaybillQuery, setSfWaybillQuery] = useState('');
+  const [sfDateRange, setSfDateRange] = useState({ startDate: '', endDate: '' });
+  const [sfStatusFilter, setSfStatusFilter] = useState('');
+  const [serviceSubTab, setServiceSubTab] = useState<'summary' | 'journals'>('summary');
+  const [expandedSummaryMerchantId, setExpandedSummaryMerchantId] = useState<string | null>(null);
+
+  // Order Transaction Payment Channel & Detail States
+  const [orderPayChannelFilter, setOrderPayChannelFilter] = useState('');
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
+  const [selectedOrderDetail, setSelectedOrderDetail] = useState<any | null>(null);
+
+  // Toast / Notification State
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // Manual Adjust / Top-up Modal State
+  const [manualFundModal, setManualFundModal] = useState<{
+    isOpen: boolean;
+    merchantId: string;
+    merchantName: string;
+    type: '充值' | '抵扣关运费' | '手动调整';
+    amount: string;
+    currency: 'HKD' | 'CNY';
+    remark: string;
+    operator: string;
+  }>({
+    isOpen: false,
+    merchantId: '1014',
+    merchantName: '万选文旅',
+    type: '充值',
+    amount: '',
+    currency: 'HKD',
+    remark: '',
+    operator: 'admin'
+  });
+
+  const openManualFundModal = (merchantId?: string, defaultType: '充值' | '抵扣关运费' | '手动调整' = '充值') => {
+    const targetM = serviceAccounts.find(s => s.merchantId === merchantId) || serviceAccounts[0];
+    setManualFundModal({
+      isOpen: true,
+      merchantId: targetM ? targetM.merchantId : '1014',
+      merchantName: targetM ? targetM.merchantName : '万选文旅',
+      type: defaultType,
+      amount: '',
+      currency: 'HKD',
+      remark: defaultType === '充值' ? '商家服务账户备用金充值' : '7月顺丰关税运费核算抵扣',
+      operator: 'admin'
+    });
+  };
+
+  const handleManualFundSubmit = () => {
+    const amt = parseFloat(manualFundModal.amount);
+    if (isNaN(amt) || amt <= 0) {
+      alert('请输入有效的金额');
+      return;
+    }
+
+    const { merchantId, merchantName, type, currency, remark, operator } = manualFundModal;
+    const isIncrease = type === '充值';
+    const delta = isIncrease ? amt : -amt;
+
+    // 1. 更新 serviceAccounts 列表中的余额和待结算
+    setServiceAccounts(prev => prev.map(sa => {
+      if (sa.merchantId === merchantId) {
+        const newBal = Math.max(0, sa.accountBalance + delta);
+        const newUnsettled = isIncrease 
+          ? Math.max(0, sa.unsettledAmount - amt)
+          : sa.unsettledAmount;
+        const newStatus = newUnsettled === 0 ? '已结清' : '待补缴';
+        return {
+          ...sa,
+          accountBalance: newBal,
+          unsettledAmount: newUnsettled,
+          status: newStatus as any,
+          lastUpdated: new Date().toISOString().slice(0, 19).replace('T', ' ')
+        };
+      }
+      return sa;
+    }));
+
+    // 2. 添加 Journal 流水
+    const newTxnId = `TXN${new Date().toISOString().slice(0, 10).replace(/-/g, '')}${Math.floor(1000 + Math.random() * 9000)}`;
+    const targetSa = serviceAccounts.find(s => s.merchantId === merchantId);
+    const balanceAfter = (targetSa ? targetSa.accountBalance : 0) + delta;
+
+    setAccountJournals(prev => [
+      {
+        id: newTxnId,
+        merchantId,
+        merchantName,
+        type,
+        amount: isIncrease ? amt : -amt,
+        currency,
+        time: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        operator,
+        remark: remark || (type === '充值' ? '管理员手动充值' : '关运费冲抵扣减'),
+        balanceAfter: Math.max(0, balanceAfter)
+      },
+      ...prev
+    ]);
+
+    showToast(`已成功为【${merchantName}】办理 ${type} ${currency} ${amt.toFixed(2)}`);
+    setManualFundModal(prev => ({ ...prev, isOpen: false }));
+  };
+
+  const handleImportSfBillConfirm = () => {
+    showToast(`顺丰 ${sfImportMonth} 月度报关运费表单导入成功！已自动核对 ${sfBills.length} 笔订单关税与运费账单。`);
+    setImportSfModalOpen(false);
+    setSfImportStep('upload');
+  };
+  
+  // Merchant Basic Info Editing States
+  const [editMerchantName, setEditMerchantName] = useState('');
+  const [editMerchantPhone, setEditMerchantPhone] = useState('');
+  const [editMerchantRole, setEditMerchantRole] = useState<'服务商' | '主理人'>('服务商');
+  const [editMerchantStatus, setEditMerchantStatus] = useState('运营中');
+
+  // Add Merchant State & Handlers
+  const [addForm, setAddForm] = useState({ name: '', phone: '' });
+
+  const openAddModal = (type: 'provider' | 'sub', parentId?: string) => {
+    const prefix = type === 'provider' ? '138' : '139';
+    const randomDigits = Math.floor(10000000 + Math.random() * 89999999);
+    const defaultPhone = `${prefix}${String(randomDigits).slice(0, 8)}`;
+    setAddForm({
+      name: '',
+      phone: defaultPhone
+    });
+    setAddModal({ isOpen: true, type, parentId });
+  };
+
+  const handleCreateMerchant = () => {
+    const name = addForm.name.trim() || (addModal.type === 'provider' ? '新服务商' : '新主理人');
+    const phone = addForm.phone.trim() || '13800001234';
+    const newId = String(Math.floor(1000 + Math.random() * 9000));
+
+    if (addModal.type === 'provider') {
+      const newProvider = {
+        id: newId,
+        name,
+        role: '服务商' as const,
+        phone,
+        status: '运营中',
+        funds: { hkd: 0 },
+        payment: { domesticMchId: '', internationalMchId: '', status: '未配置' },
+        children: []
+      };
+      setMerchants(prev => [newProvider, ...prev]);
+    } else if (addModal.type === 'sub' && addModal.parentId) {
+      const newSub = {
+        id: newId,
+        name,
+        role: '主理人' as const,
+        phone,
+        status: '运营中',
+        funds: { hkd: 0 },
+        payment: {
+          domesticMchId: '1600000001',
+          internationalMchId: '',
+          linkedInfo: '复用服务商商户号',
+          status: '已配置'
+        }
+      };
+      setMerchants(prev => prev.map(m => {
+        if (m.id === addModal.parentId) {
+          return {
+            ...m,
+            children: [...(m.children || []), newSub]
+          };
+        }
+        return m;
+      }));
+      setExpandedRows(prev => ({ ...prev, [addModal.parentId!]: true }));
+    }
+
+    setAddModal({ isOpen: false, type: 'provider' });
+  };
+
+  // Merchant Payment Editing States
+  const [isEditingPayment, setIsEditingPayment] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    domesticMchId: '',
+    internationalMchId: '',
+    linkedInfo: ''
+  });
+
   const [productDrawer, setProductDrawer] = useState<{isOpen: boolean, product: any}>({isOpen: false, product: null});
   const [addProductDrawer, setAddProductDrawer] = useState<{isOpen: boolean}>({isOpen: false});
   const [filingModal, setFilingModal] = useState<{isOpen: boolean, product: any}>({isOpen: false, product: null});
   const [fundsTab, setFundsTab] = useState('orders');
-  const [editingMarketScope, setEditingMarketScope] = useState('全部集市商品');
   const [topupModal, setTopupModal] = useState<{isOpen: boolean, merchant: any}>({isOpen: false, merchant: null});
+
+  // Helper functions for merchant drawer & editing
+  const openMerchantDetail = (merchant: any, activeTab: string = 'basic') => {
+    setDetailDrawer({ isOpen: true, merchant, activeTab });
+    setIsEditingMerchant(false);
+    setIsEditingPayment(false);
+    setEditMerchantName(merchant.name || '');
+    setEditMerchantPhone(merchant.phone || '');
+    setEditMerchantRole(merchant.role || '服务商');
+    setEditMerchantStatus(merchant.status || '运营中');
+  };
+
+  const handleStartEditingBasic = () => {
+    if (!detailDrawer.merchant) return;
+    setEditMerchantName(detailDrawer.merchant.name || '');
+    setEditMerchantPhone(detailDrawer.merchant.phone || '');
+    setEditMerchantRole(detailDrawer.merchant.role || '服务商');
+    setEditMerchantStatus(detailDrawer.merchant.status || '运营中');
+    setIsEditingMerchant(true);
+  };
+
+  const handleSaveBasicInfo = () => {
+    if (!detailDrawer.merchant) return;
+
+    // Check if switching from 主理人 to 服务商
+    const isRoleSwitchToProvider = detailDrawer.merchant.role === '主理人' && editMerchantRole === '服务商';
+
+    const updatedPayment = isRoleSwitchToProvider
+      ? { domesticMchId: '', internationalMchId: '', linkedInfo: '', status: '未配置' }
+      : detailDrawer.merchant.payment;
+
+    const updatedMerchant = {
+      ...detailDrawer.merchant,
+      name: editMerchantName,
+      phone: editMerchantPhone,
+      role: editMerchantRole,
+      status: editMerchantStatus,
+      payment: updatedPayment
+    };
+
+    setMerchants(prev => {
+      return prev.map(m => {
+        if (m.id === updatedMerchant.id) return updatedMerchant;
+        if (m.children && m.children.length > 0) {
+          return {
+            ...m,
+            children: m.children.map(c => c.id === updatedMerchant.id ? updatedMerchant : c)
+          };
+        }
+        return m;
+      });
+    });
+
+    setDetailDrawer(prev => ({ ...prev, merchant: updatedMerchant }));
+    setIsEditingMerchant(false);
+  };
+
+  const handleStartEditingPayment = () => {
+    if (!detailDrawer.merchant) return;
+    setPaymentForm({
+      domesticMchId: detailDrawer.merchant.payment?.domesticMchId || '',
+      internationalMchId: detailDrawer.merchant.payment?.internationalMchId || '',
+      linkedInfo: detailDrawer.merchant.payment?.linkedInfo || ''
+    });
+    setIsEditingPayment(true);
+  };
+
+  const handleSavePayment = () => {
+    if (!detailDrawer.merchant) return;
+    const isConfigured = Boolean(paymentForm.domesticMchId || paymentForm.internationalMchId);
+
+    const updatedPayment = {
+      domesticMchId: paymentForm.domesticMchId,
+      internationalMchId: paymentForm.internationalMchId,
+      linkedInfo: paymentForm.linkedInfo,
+      status: isConfigured ? '已配置' : '未配置'
+    };
+
+    const updatedMerchant = {
+      ...detailDrawer.merchant,
+      payment: updatedPayment
+    };
+
+    setMerchants(prev => {
+      return prev.map(m => {
+        if (m.id === updatedMerchant.id) return updatedMerchant;
+        if (m.children && m.children.length > 0) {
+          return {
+            ...m,
+            children: m.children.map(c => c.id === updatedMerchant.id ? updatedMerchant : c)
+          };
+        }
+        return m;
+      });
+    });
+
+    setDetailDrawer(prev => ({ ...prev, merchant: updatedMerchant }));
+    setIsEditingPayment(false);
+  };
 
   // Mapping States
   const [mappingMerchant, setMappingMerchant] = useState('');
@@ -249,7 +767,6 @@ export default function App() {
       items: [
         { id: 'public-products', icon: Boxes, label: '公共商品库' },
         { id: 'hscode', icon: BookOpen, label: '商品备案' },
-        { id: 'mapping', icon: GitMerge, label: '商家分类映射' },
       ]
     },
     {
@@ -263,7 +780,8 @@ export default function App() {
     {
       title: '财务报表',
       items: [
-        { id: 'funds', icon: CreditCard, label: '资金对账中心' },
+        { id: 'funds-orders', icon: Receipt, label: '订单交易' },
+        { id: 'funds-service', icon: Wallet, label: '服务账户' },
       ]
     }
   ];
@@ -275,7 +793,7 @@ export default function App() {
   const renderMerchantView = () => (
     <div className="animate-in fade-in duration-300 h-full flex flex-col">
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex flex-col gap-3 shrink-0">
-        <h2 className="text-xl font-semibold text-gray-800">商家与权限控制中心</h2>
+        <h2 className="text-xl font-semibold text-gray-800">商家管理</h2>
       </div>
 
       <div className="flex-1 p-6 overflow-y-auto bg-gray-50">
@@ -292,7 +810,7 @@ export default function App() {
             </button>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setAddModal({isOpen: true, type: 'provider'})} className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm flex items-center gap-1.5 transition-colors shadow-sm">
+            <button onClick={() => openAddModal('provider')} className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded text-sm flex items-center gap-1.5 transition-colors shadow-sm">
               <Plus size={16} /> 新增服务商
             </button>
           </div>
@@ -305,72 +823,134 @@ export default function App() {
                 <th className="py-3 px-4 font-medium w-8"></th>
                 <th className="py-3 px-4 font-medium">商家名称/ID</th>
                 <th className="py-3 px-4 font-medium">角色定位</th>
-                <th className="py-3 px-4 font-medium">分销商品范围</th>
-                <th className="py-3 px-4 font-medium">商户号(支付)</th>
-                <th className="py-3 px-4 font-medium">账户资金(HKD)</th>
+                <th className="py-3 px-4 font-medium">微信商户号(国内 / 国际)</th>
+                <th className="py-3 px-4 font-medium">服务账户余额 (HKD)</th>
                 <th className="py-3 px-4 font-medium text-right">管理操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {mockMerchants.map(merchant => (
-                <React.Fragment key={merchant.id}>
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td className="py-3 px-4">
-                      {merchant.children && merchant.children.length > 0 && (
-                        <button onClick={() => toggleRow(merchant.id)} className="text-gray-400 hover:text-gray-600">
-                          {expandedRows[merchant.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                        </button>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="font-medium text-gray-800">{merchant.name}</div>
-                      <div className="text-gray-500 text-xs font-mono">{merchant.id}</div>
-                    </td>
-                    <td className="py-3 px-4"><Tag color="blue">{merchant.role}</Tag></td>
-                    <td className="py-3 px-4 text-gray-700">{merchant.role === "服务商" ? merchant.marketScope || "-" : "-"}</td>
-                    <td className="py-3 px-4 text-xs font-mono">
-                      <div className="text-gray-700">国内: {merchant.payment?.domesticMchId || '-'}</div>
-                      {merchant.payment && 'internationalMchId' in merchant.payment && <div className="text-gray-500 mt-0.5">国际: {(merchant.payment as any).internationalMchId}</div>}
-                      {merchant.payment && 'linkedInfo' in merchant.payment && <div className="text-brand mt-0.5 px-1 bg-brand-light/20 inline-block rounded">{(merchant.payment as any).linkedInfo}</div>}
-                    </td>
-                    <td className="py-3 px-4 font-mono text-gray-800 text-sm font-medium">
-                      HKD {merchant.funds.hkd.toLocaleString('en-US', {minimumFractionDigits: 2})}
-                    </td>
-                    <td className="py-3 px-4 text-right space-x-3">
-                      <button onClick={() => setActiveNav('funds')} className="text-gray-700 hover:text-gray-800 font-medium">对账</button>
-                      <button onClick={() => { setDetailDrawer({isOpen: true, merchant, activeTab: 'basic'}); setIsEditingMerchant(false); setEditingMarketScope(merchant.marketScope || '全部集市商品'); }} className="text-brand hover:text-brand-hover font-medium">权限/基础设置</button>
-                      <button onClick={() => setTopupModal({isOpen: true, merchant})} className="text-brand hover:text-brand-hover font-medium">充值</button>
-                    </td>
-                  </tr>
-                  {expandedRows[merchant.id] && merchant.children?.map(child => (
-                    <tr key={child.id} className="bg-gray-50/50 hover:bg-gray-50 transition-colors">
-                      <td className="py-3 px-4"></td>
-                      <td className="py-3 px-4 flex items-center gap-2">
-                        <div className="w-4 h-[1px] bg-gray-300"></div>
-                        <div>
-                          <div className="text-gray-700 font-medium">{child.name}</div>
-                          <div className="text-gray-500 text-xs font-mono">{child.id}</div>
-                        </div>
+              {merchants.map(merchant => {
+                const sa = serviceAccounts.find(s => s.merchantId === merchant.id);
+                const currentBalance = sa ? sa.accountBalance : merchant.funds.hkd;
+                return (
+                  <React.Fragment key={merchant.id}>
+                    <tr className="hover:bg-gray-50 transition-colors">
+                      <td className="py-3 px-4">
+                        {merchant.children && merchant.children.length > 0 && (
+                          <button onClick={() => toggleRow(merchant.id)} className="text-gray-400 hover:text-gray-600">
+                            {expandedRows[merchant.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                          </button>
+                        )}
                       </td>
-                      <td className="py-3 px-4"><Tag color="orange">{child.role}</Tag></td>
-                      <td className="py-3 px-4 text-gray-600">-</td>
+                      <td className="py-3 px-4">
+                        <div className="font-medium text-gray-800">{merchant.name}</div>
+                        <div className="text-gray-500 text-xs font-mono">{merchant.id}</div>
+                      </td>
+                      <td className="py-3 px-4"><Tag color="blue">{merchant.role}</Tag></td>
                       <td className="py-3 px-4 text-xs font-mono">
-                        <div className="text-gray-700">国内: {child.payment?.domesticMchId || '-'}</div>
-                        {child.payment && 'internationalMchId' in child.payment && <div className="text-gray-500 mt-0.5">国际: {(child.payment as any).internationalMchId}</div>}
-                        {child.payment && 'linkedInfo' in child.payment && <div className="text-brand mt-0.5 px-1.5 py-0.5 bg-brand-light/30 inline-block rounded">{(child.payment as any).linkedInfo}</div>}
+                        <div className="text-gray-700">国内: {merchant.payment?.domesticMchId || '未配置'}</div>
+                        <div className="text-gray-500 mt-0.5">国际: {merchant.payment?.internationalMchId || '未配置'}</div>
+                        {merchant.payment?.linkedInfo && <div className="text-brand mt-0.5 px-1 bg-brand-light/20 inline-block rounded">{merchant.payment.linkedInfo}</div>}
                       </td>
-                      <td className="py-3 px-4 font-mono text-gray-800 text-sm font-medium">
-                        HKD {child.funds.hkd.toLocaleString('en-US', {minimumFractionDigits: 2})}
+                      <td className="py-3 px-4 font-mono text-gray-900 text-sm font-bold">
+                        HKD {currentBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}
                       </td>
                       <td className="py-3 px-4 text-right space-x-3">
-                        <button onClick={() => setActiveNav('funds')} className="text-gray-700 hover:text-gray-800 font-medium">对账</button>
-                        <button onClick={() => { setDetailDrawer({isOpen: true, merchant: child, activeTab: 'basic'}); setIsEditingMerchant(false); setEditingMarketScope((child as any).marketScope || '全部集市商品'); }} className="text-brand hover:text-brand-hover font-medium">权限/基础设置</button>
-                        <button onClick={() => setTopupModal({isOpen: true, merchant: child})} className="text-brand hover:text-brand-hover font-medium">充值</button>
+                        <button onClick={() => openAddModal('sub', merchant.id)} className="text-brand hover:text-brand-hover font-medium">+ 新增主理人</button>
+                        <button onClick={() => openMerchantDetail(merchant, 'basic')} className="text-brand hover:text-brand-hover font-medium">商家详情</button>
+                        <button 
+                          onClick={() => {
+                            const targetSa = sa || {
+                              merchantId: merchant.id,
+                              merchantName: merchant.name,
+                              role: merchant.role as any,
+                              billingMonth: '2026-07',
+                              taxPayable: 0,
+                              freightPayable: 0,
+                              totalPayable: 0,
+                              preDeducted: 0,
+                              unsettledAmount: 0,
+                              accountBalance: currentBalance,
+                              currency: 'HKD' as const,
+                              status: '已结清' as const,
+                              lastUpdated: '2026-07-26 18:30'
+                            };
+                            setSelectedMerchantDetail(targetSa);
+                            setActiveNav('funds-service');
+                          }} 
+                          className="text-brand hover:text-brand-hover font-semibold hover:underline text-sm"
+                        >
+                          服务账户对账
+                        </button>
+                        <button 
+                          onClick={() => openManualFundModal(merchant.id, '充值')} 
+                          className="text-gray-700 hover:text-gray-900 font-medium hover:underline text-sm"
+                        >
+                          充值/扣款
+                        </button>
                       </td>
                     </tr>
-                  ))}
-                </React.Fragment>
-              ))}
+                    {expandedRows[merchant.id] && merchant.children?.map(child => {
+                      const childSa = serviceAccounts.find(s => s.merchantId === child.id);
+                      const childBalance = childSa ? childSa.accountBalance : child.funds.hkd;
+                      return (
+                        <tr key={child.id} className="bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                          <td className="py-3 px-4"></td>
+                          <td className="py-3 px-4 flex items-center gap-2">
+                            <div className="w-4 h-[1px] bg-gray-300"></div>
+                            <div>
+                              <div className="text-gray-700 font-medium">{child.name}</div>
+                              <div className="text-gray-500 text-xs font-mono">{child.id}</div>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4"><Tag color="orange">{child.role}</Tag></td>
+                          <td className="py-3 px-4 text-xs font-mono">
+                            <div className="text-gray-700">国内: {child.payment?.domesticMchId || '未配置'}</div>
+                            <div className="text-gray-500 mt-0.5">国际: {child.payment?.internationalMchId || '未配置'}</div>
+                            {child.payment?.linkedInfo && <div className="text-brand mt-0.5 px-1.5 py-0.5 bg-brand-light/30 inline-block rounded">{child.payment.linkedInfo}</div>}
+                          </td>
+                          <td className="py-3 px-4 font-mono text-gray-900 text-sm font-bold">
+                            HKD {childBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}
+                          </td>
+                          <td className="py-3 px-4 text-right space-x-3">
+                            <button onClick={() => openMerchantDetail(child, 'basic')} className="text-brand hover:text-brand-hover font-medium">商家详情</button>
+                            <button 
+                              onClick={() => {
+                                const targetSa = childSa || {
+                                  merchantId: child.id,
+                                  merchantName: child.name,
+                                  role: child.role as any,
+                                  billingMonth: '2026-07',
+                                  taxPayable: 0,
+                                  freightPayable: 0,
+                                  totalPayable: 0,
+                                  preDeducted: 0,
+                                  unsettledAmount: 0,
+                                  accountBalance: childBalance,
+                                  currency: 'HKD' as const,
+                                  status: '已结清' as const,
+                                  lastUpdated: '2026-07-26 18:30'
+                                };
+                                setSelectedMerchantDetail(targetSa);
+                                setActiveNav('funds-service');
+                              }} 
+                              className="text-brand hover:text-brand-hover font-semibold hover:underline text-sm"
+                            >
+                              服务账户对账
+                            </button>
+                            <button 
+                              onClick={() => openManualFundModal(child.id, '充值')} 
+                              className="text-gray-700 hover:text-gray-900 font-medium hover:underline text-sm"
+                            >
+                              充值/扣款
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </React.Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -777,12 +1357,28 @@ export default function App() {
           <BookOpen size={16} /> 分类备案
         </button>
         <button onClick={() => setFilingTab('product')} className={`pb-3 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${filingTab === 'product' ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-black'}`}>
-          <FileText size={16} /> 指定商品备案
+          <FileText size={16} /> 商品备案
         </button>
       </div>
 
       {filingTab === 'category' && (
-        <div className="flex gap-6 flex-1 min-h-0 animate-in fade-in">
+        <div className="flex-1 flex flex-col min-h-0 animate-in fade-in">
+          <div className="flex gap-4 mb-4 shrink-0">
+            <button 
+              onClick={() => setCategoryFilingTab('public')} 
+              className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${categoryFilingTab === 'public' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'}`}
+            >
+              公共库分类备案
+            </button>
+            <button 
+              onClick={() => setCategoryFilingTab('merchant')} 
+              className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${categoryFilingTab === 'merchant' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'}`}
+            >
+              商家分类映射
+            </button>
+          </div>
+          {categoryFilingTab === 'public' && (
+            <div className="flex gap-6 flex-1 min-h-0">
           {/* Left Sidebar - Categories */}
           <div className="w-64 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden shrink-0">
             <div className="p-3 border-b border-gray-200 flex justify-between items-center bg-gray-50">
@@ -850,102 +1446,11 @@ export default function App() {
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {filingTab === 'product' && (
-        <div className="flex-1 flex flex-col min-h-0 animate-in fade-in">
-          <div className="flex gap-4 mb-4">
-            <button 
-              onClick={() => setProductFilingTab('merchant')} 
-              className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${productFilingTab === 'merchant' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'}`}
-            >
-              商家商品
-            </button>
-            <button 
-              onClick={() => setProductFilingTab('public')} 
-              className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${productFilingTab === 'public' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'}`}
-            >
-              公共库商品
-            </button>
-          </div>
-
-          <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden">
-             <div className="p-4 border-b border-gray-200 flex gap-4 items-center bg-gray-50/50">
-                {productFilingTab === 'merchant' && (
-                  <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-brand/40" placeholder="商家 ID" />
-                )}
-                <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-64 focus:outline-none focus:border-brand/40" placeholder="输入 SPU 货号查询" />
-                <button className="bg-brand hover:bg-brand-hover text-white px-5 py-1.5 rounded-md text-sm transition-colors">查询</button>
-             </div>
-             <div className="flex-1 overflow-auto">
-               <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
-                  <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 sticky top-0">
-                    <tr>
-                      <th className="py-3 px-6 font-medium">标准货号</th>
-                      <th className="py-3 px-4 font-medium">商品名称</th>
-                      {productFilingTab === 'merchant' && (
-                        <th className="py-3 px-4 font-medium">商家 ID</th>
-                      )}
-                      <th className="py-3 px-4 font-medium">特定 HS Code</th>
-                      <th className="py-3 px-4 font-medium">备案状态</th>
-                      <th className="py-3 px-6 font-medium text-right">操作</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {mockProducts.map(prod => (
-                      <tr key={prod.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="py-4 px-6 font-mono text-gray-600">{prod.id}</td>
-                        <td className="py-4 px-4 text-gray-800">{prod.name}</td>
-                        {productFilingTab === 'merchant' && (
-                          <td className="py-4 px-4 font-mono text-gray-500">1567</td>
-                        )}
-                        <td className="py-4 px-4"><span className="font-mono text-brand">{prod.filingInfo.hsCode}</span></td>
-                        <td className="py-4 px-4">
-                          <Tag color={prod.filingInfo.status === '已备案' ? 'green' : 'orange'}>{prod.filingInfo.status}</Tag>
-                        </td>
-                        <td className="py-4 px-6 text-right space-x-3">
-                          <button onClick={() => setFilingModal({isOpen: true, product: prod})} className="text-brand hover:underline font-medium">修改备案</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-             </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  const handleMapCategories = () => {
-    if (selectedMerchantCats.length === 0 || !selectedPublicCat) return;
-
-    let publicCatName = '';
-    categories.forEach(c => {
-      if (c.id === selectedPublicCat) publicCatName = c.name;
-      c.children.forEach(child => {
-        if (child.id === selectedPublicCat) publicCatName = `${c.name} > ${child.name}`;
-      });
-    });
-
-    const newMappings = { ...categoryMappings };
-    selectedMerchantCats.forEach(id => {
-      newMappings[id] = { id: selectedPublicCat, name: publicCatName };
-    });
-    setCategoryMappings(newMappings);
-    setSelectedMerchantCats([]);
-    setSelectedPublicCat('');
-  };
-
-  const renderCategoryMappingView = () => {
-    return (
-      <div className="animate-in fade-in duration-300 h-full flex flex-col p-6">
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-800">商家分类映射</h2>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex items-center gap-4">
+            </div>
+          )}
+          {categoryFilingTab === 'merchant' && (
+            <div className="flex-1 flex flex-col min-h-0">
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex items-center gap-4 shrink-0">
           <label className="text-sm font-medium text-gray-700 w-24">选择商家</label>
           <div className="relative group w-80">
             <div className="flex items-center border border-gray-300 rounded px-3 py-2 text-sm focus-within:border-black focus-within:ring-1 focus-within:ring-black bg-white cursor-text transition-all">
@@ -1086,208 +1591,978 @@ export default function App() {
             <p>请先在上方选择商户以进行分类映射配置</p>
           </div>
         )}
-      </div>
-    );
-  };
-
-  const renderFundsView = () => (
-    <div className="animate-in fade-in duration-300 h-full flex flex-col p-6">
-      <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-          <div className="w-1 h-5 bg-brand rounded-full"></div>
-          资金对账中心
-        </h2>
-      </div>
-
-      {/* Top Cards */}
-      <div className="grid grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col justify-center">
-          <div className="text-sm text-gray-500 mb-2">待结算资金池</div>
-          <div className="text-2xl font-bold text-gray-800">￥ 657.00</div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col justify-center">
-          <div className="text-sm text-gray-500 mb-2">收入</div>
-          <div className="text-2xl font-bold text-gray-700">￥ 342,116.12</div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col justify-center">
-          <div className="text-sm text-gray-500 mb-2">店铺税金余额</div>
-          <div className="text-2xl font-bold text-gray-800">￥ -58.75</div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-6 border-b border-gray-200 mb-6">
-        <button onClick={() => setFundsTab('orders')} className={`pb-3 text-sm font-medium border-b-2 transition-colors ${fundsTab === 'orders' ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
-          订单交易流水
-        </button>
-        <button onClick={() => setFundsTab('service')} className={`pb-3 text-sm font-medium border-b-2 transition-colors ${fundsTab === 'service' ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
-          服务账户流水
-        </button>
-      </div>
-
-      {fundsTab === 'orders' && (
-        <div className="flex-1 flex flex-col animate-in fade-in">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex gap-3 flex-wrap">
-              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-40 focus:outline-none focus:border-brand/40" placeholder="商家名称/ID" />
-              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-40 focus:outline-none focus:border-brand/40" placeholder="订单号" />
-              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-40 focus:outline-none focus:border-brand/40" placeholder="支付单号" />
-              <select className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-brand/40 text-gray-600">
-                <option value="">订单状态</option>
-                <option value="paid">已支付</option>
-                <option value="clearing">清关中</option>
-                <option value="shipped">已发货</option>
-                <option value="completed">交易完成</option>
-                <option value="closed">交易关闭</option>
-              </select>
-              <select className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-brand/40 text-gray-600">
-                <option value="">支付方式</option>
-                <option value="intl">国际支付</option>
-                <option value="domestic">国内支付</option>
-              </select>
-              <button className="bg-brand hover:bg-brand-hover text-white px-5 py-1.5 rounded-md text-sm transition-colors">
-                查询
-              </button>
             </div>
-            <button className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1.5 rounded-md text-sm transition-colors shadow-sm whitespace-nowrap">
-              批量导出流水
-            </button>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto flex-1">
-            <table className="w-full text-left text-sm min-w-max">
-              <thead className="bg-gray-50 border-b border-gray-200 text-gray-600">
-                <tr>
-                  <th className="py-3 px-4 font-medium">订单号 / 支付单号</th>
-                  <th className="py-3 px-4 font-medium">销售商家</th>
-                  <th className="py-3 px-4 font-medium">交易状态</th>
-                  <th className="py-3 px-4 font-medium">实付金额 / 支付方式</th>
-                  <th className="py-3 px-4 font-medium">扣除项 (手续费/税费/运费)</th>
-                  <th className="py-3 px-4 font-medium">分账标识</th>
-                  <th className="py-3 px-4 font-medium">货主定扎明细</th>
-                  <th className="py-3 px-4 font-medium">分佣方明细</th>
-                  <th className="py-3 px-4 font-medium text-right">操作</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {[
-                  { orderId: 'OD20240419113', payId: 'P20240419113941', store: '1014 - 万选文旅', status: '待发货', progress: '已清关', total: 'HKD 1,485.50', payType: '国际支付', fee: 'HKD 14.85', tax: 'HKD 54.00', shipping: 'HKD 45.00', hasSplit: true, owner: '万选文旅', ownerAmt: 'HKD 1,221.65', broker: '平台分佣', brokerAmt: 'HKD 150.00' },
-                  { orderId: 'OD20240418214', payId: 'P20240418104845', store: '2055 - HANNAH加盟店', status: '已完成', progress: '已完成', total: 'CNY 714.61', payType: '国内支付', fee: 'CNY 4.28', tax: 'CNY 65.00', shipping: 'CNY 15.00', hasSplit: true, owner: '万选文旅', ownerAmt: 'CNY 500.00', broker: 'HANNAH加盟店', brokerAmt: 'CNY 130.33' },
-                  { orderId: 'OD20240417101', payId: 'P20240415951662', store: '1018 - 中出服免税', status: '交易关闭', progress: '主动取消', total: 'CNY 310.94', payType: '国内支付', fee: 'CNY 0.00', tax: 'CNY 0.00', shipping: 'CNY 0.00', hasSplit: false, owner: '--', ownerAmt: '--', broker: '--', brokerAmt: '--' },
-                  { orderId: 'OD20240414166', payId: 'P20240416481294', store: '1014 - 万选文旅', status: '已发货', progress: '运输中', total: 'HKD 992.13', payType: '国际支付', fee: 'HKD 9.92', tax: 'HKD 90.50', shipping: 'HKD 45.00', hasSplit: true, owner: '万选文旅', ownerAmt: 'HKD 846.71', broker: '--', brokerAmt: '--' },
-                ].map((row, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-3 px-4">
-                      <div className="font-mono text-gray-800">{row.orderId}</div>
-                      <div className="text-gray-400 text-xs font-mono">P: {row.payId}</div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="text-brand font-medium cursor-pointer hover:underline">{row.store}</div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className={row.status === '交易关闭' ? 'text-gray-500' : 'text-gray-800'}>{row.status}</div>
-                      <div className="text-xs text-gray-500">{row.progress}</div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="font-medium text-gray-800">{row.total}</div>
-                      <Tag color={row.payType === '国际支付' ? 'blue' : 'green'}>{row.payType}</Tag>
-                    </td>
-                    <td className="py-3 px-4 text-xs">
-                      <div className="grid grid-cols-[50px_1fr] gap-x-2">
-                        <span className="text-gray-500 text-right">手续费:</span><span className="text-red-500 font-mono">-{row.fee}</span>
-                        <span className="text-gray-500 text-right">税费:</span><span className="text-orange-500 font-mono">-{row.tax}</span>
-                        <span className="text-gray-500 text-right">运费:</span><span className="text-blue-500 font-mono">-{row.shipping}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      {row.hasSplit ? <Tag color="green">已分账</Tag> : <span className="text-gray-400 text-xs">未分账</span>}
-                    </td>
-                    <td className="py-3 px-4">
-                       <div className="text-gray-700 font-medium">{row.owner}</div>
-                       <div className="text-xs font-mono text-gray-500">{row.ownerAmt}</div>
-                    </td>
-                    <td className="py-3 px-4">
-                       <div className="text-gray-700 font-medium">{row.broker}</div>
-                       <div className="text-xs font-mono text-gray-500">{row.brokerAmt}</div>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <button className="text-brand hover:text-brand-hover hover:underline text-sm font-medium">详情</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          )}
         </div>
       )}
 
-      {fundsTab === 'service' && (
-        <div className="flex-1 flex flex-col animate-in fade-in">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex gap-3">
-              <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-64 focus:outline-none focus:border-emerald-500" placeholder="商家名称/ID" />
-              <select className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500 text-gray-600">
-                <option value="">全部类型</option>
-                <option value="topup">充值</option>
-                <option value="deduct">扣减</option>
-              </select>
-              <div className="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white">
-                <input type="text" className="px-3 py-1.5 text-sm w-32 focus:outline-none" placeholder="开始日期" />
-                <span className="text-gray-400 px-2">至</span>
-                <input type="text" className="px-3 py-1.5 text-sm w-32 focus:outline-none" placeholder="结束日期" />
-              </div>
-              <button className="bg-brand hover:bg-brand-hover text-white px-5 py-1.5 rounded-md text-sm transition-colors">
-                查询
-              </button>
-            </div>
-            <button className="bg-brand hover:bg-brand-hover text-white px-4 py-1.5 rounded-md text-sm transition-colors shadow-sm flex items-center gap-1.5">
-              <Plus size={16} /> 新增充值/扣减
+      {filingTab === 'product' && (
+        <div className="flex-1 flex flex-col min-h-0 animate-in fade-in">
+          <div className="flex gap-4 mb-4">
+            <button 
+              onClick={() => setProductFilingTab('merchant')} 
+              className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${productFilingTab === 'merchant' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'}`}
+            >
+              商家商品
+            </button>
+            <button 
+              onClick={() => setProductFilingTab('public')} 
+              className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${productFilingTab === 'public' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'}`}
+            >
+              公共库商品
             </button>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex-1">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200 text-gray-600">
-                <tr>
-                  <th className="py-3 px-4 font-medium">流水号</th>
-                  <th className="py-3 px-4 font-medium">商家名称/ID</th>
-                  <th className="py-3 px-4 font-medium">类型</th>
-                  <th className="py-3 px-4 font-medium">金额</th>
-                  <th className="py-3 px-4 font-medium">币种</th>
-                  <th className="py-3 px-4 font-medium">操作时间</th>
-                  <th className="py-3 px-4 font-medium">操作人</th>
-                  <th className="py-3 px-4 font-medium">备注</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {[
-                  { id: 'TXN202604120001', merchant: '万选文旅', merchantId: '1014', type: '充值', amount: '+5000.00', currency: 'CNY', time: '2026-04-12 10:30:00', operator: 'admin', remark: '预存货款' },
-                  { id: 'TXN202604110002', merchant: 'HANNAH加盟店', merchantId: '2055', type: '扣减', amount: '-150.00', currency: 'HKD', time: '2026-04-11 15:45:22', operator: 'system', remark: '系统服务费扣除' },
-                  { id: 'TXN202604100003', merchant: '万选文旅', merchantId: '1014', type: '充值', amount: '+10000.00', currency: 'HKD', time: '2026-04-10 09:15:00', operator: 'admin', remark: '保证金充值' },
-                ].map((row, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-3 px-4 font-mono text-gray-500">{row.id}</td>
-                    <td className="py-3 px-4">
-                      <div className="font-medium text-gray-800">{row.merchant}</div>
-                      <div className="text-gray-400 text-xs font-mono">{row.merchantId}</div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <Tag color={row.type === '充值' ? 'green' : 'orange'}>{row.type}</Tag>
-                    </td>
-                    <td className={`py-3 px-4 font-medium ${row.type === '充值' ? 'text-gray-700' : 'text-gray-700'}`}>{row.amount}</td>
-                    <td className="py-3 px-4 text-gray-600">{row.currency}</td>
-                    <td className="py-3 px-4 text-gray-500 text-xs">{row.time}</td>
-                    <td className="py-3 px-4 text-gray-600">{row.operator}</td>
-                    <td className="py-3 px-4 text-gray-500 text-xs max-w-[200px] truncate" title={row.remark}>{row.remark}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden">
+             <div className="p-4 border-b border-gray-200 flex gap-4 items-center bg-gray-50/50">
+                {productFilingTab === 'merchant' && (
+                  <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-48 focus:outline-none focus:border-brand/40" placeholder="商家 ID" />
+                )}
+                <input type="text" className="border border-gray-300 rounded-md px-3 py-1.5 text-sm w-64 focus:outline-none focus:border-brand/40" placeholder="输入 SPU 货号查询" />
+                <button className="bg-brand hover:bg-brand-hover text-white px-5 py-1.5 rounded-md text-sm transition-colors">查询</button>
+             </div>
+             <div className="flex-1 overflow-auto">
+               <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
+                  <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 sticky top-0">
+                    <tr>
+                      <th className="py-3 px-6 font-medium">标准货号</th>
+                      <th className="py-3 px-4 font-medium">商品名称</th>
+                      {productFilingTab === 'merchant' && (
+                        <th className="py-3 px-4 font-medium">商家 ID</th>
+                      )}
+                      <th className="py-3 px-4 font-medium">特定 HS Code</th>
+                      <th className="py-3 px-4 font-medium">备案状态</th>
+                      <th className="py-3 px-6 font-medium text-right">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {mockProducts.map(prod => (
+                      <tr key={prod.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="py-4 px-6 font-mono text-gray-600">{prod.id}</td>
+                        <td className="py-4 px-4 text-gray-800">{prod.name}</td>
+                        {productFilingTab === 'merchant' && (
+                          <td className="py-4 px-4 font-mono text-gray-500">1567</td>
+                        )}
+                        <td className="py-4 px-4"><span className="font-mono text-brand">{prod.filingInfo.hsCode}</span></td>
+                        <td className="py-4 px-4">
+                          <Tag color={prod.filingInfo.status === '已备案' ? 'green' : 'orange'}>{prod.filingInfo.status}</Tag>
+                        </td>
+                        <td className="py-4 px-6 text-right space-x-3">
+                          <button onClick={() => setFilingModal({isOpen: true, product: prod})} className="text-brand hover:underline font-medium">修改备案</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+             </div>
           </div>
         </div>
       )}
     </div>
   );
+
+  const handleMapCategories = () => {
+    if (selectedMerchantCats.length === 0 || !selectedPublicCat) return;
+
+    let publicCatName = '';
+    categories.forEach(c => {
+      if (c.id === selectedPublicCat) publicCatName = c.name;
+      c.children.forEach(child => {
+        if (child.id === selectedPublicCat) publicCatName = `${c.name} > ${child.name}`;
+      });
+    });
+
+    const newMappings = { ...categoryMappings };
+    selectedMerchantCats.forEach(id => {
+      newMappings[id] = { id: selectedPublicCat, name: publicCatName };
+    });
+    setCategoryMappings(newMappings);
+    setSelectedMerchantCats([]);
+    setSelectedPublicCat('');
+  };
+
+  // --- 1. Order Transactions View ---
+  const renderOrderTransactionsView = () => {
+    const orderData = [
+      { 
+        orderId: 'OD20260726001', 
+        payId: 'WAL202607261189', 
+        store: '1014 - 万选文旅', 
+        ownerName: '万选文旅',
+        status: '待发货', 
+        progress: '清关通过', 
+        payChannel: 'Wallyt 国际支付',
+        total: 'HKD 1,485.50', 
+        fee: 'HKD 14.85', 
+        feeRate: 'Wallyt 1.0%',
+        tax: 'HKD 54.00', 
+        shipping: 'HKD 45.00', 
+        hasSplit: true, 
+        splitStatus: '已自动分账',
+        owner: '万选文旅 (服务账户)', 
+        ownerAmt: 'HKD 1,221.65', 
+        broker: '平台服务费与分佣', 
+        brokerAmt: 'HKD 150.00',
+        customsDeclare: 'Wallyt代推海关支付单 (通关成功)',
+        orderTime: '2026-07-26 14:22:10'
+      },
+      { 
+        orderId: 'OD20260725042', 
+        payId: 'SFT202607258832', 
+        store: '2055 - HANNAH加盟店', 
+        ownerName: '万选文旅',
+        status: '已完成', 
+        progress: '买家已签收', 
+        payChannel: '微信收付通',
+        total: 'CNY 714.61', 
+        fee: 'CNY 4.28', 
+        feeRate: '微信 0.6%',
+        tax: 'CNY 65.00', 
+        shipping: 'CNY 15.00', 
+        hasSplit: true, 
+        splitStatus: '二级商户号解冻',
+        owner: '万选文旅 (货主)', 
+        ownerAmt: 'CNY 500.00', 
+        broker: 'HANNAH加盟店 (分销佣金)', 
+        brokerAmt: 'CNY 130.33',
+        customsDeclare: '微信收付通报关推单 (179单已推)',
+        orderTime: '2026-07-25 10:15:44'
+      },
+      { 
+        orderId: 'OD20260724089', 
+        payId: 'YS202607249912', 
+        store: '1018 - 中出服免税', 
+        ownerName: '中出服免税',
+        status: '已发货', 
+        progress: '顺丰跨境直邮中', 
+        payChannel: '易生支付',
+        total: 'CNY 2,380.00', 
+        fee: 'CNY 9.52', 
+        feeRate: '易生 0.4%',
+        tax: 'CNY 210.00', 
+        shipping: 'CNY 25.00', 
+        hasSplit: true, 
+        splitStatus: '托管账户已分账',
+        owner: '中出服免税', 
+        ownerAmt: 'CNY 2,015.48', 
+        broker: '开放平台服务费', 
+        brokerAmt: 'CNY 120.00',
+        customsDeclare: '易生关企直连推单 (放行)',
+        orderTime: '2026-07-24 18:05:12'
+      },
+      { 
+        orderId: 'OD20260722101', 
+        payId: 'WAL202607224419', 
+        store: '1014 - 万选文旅', 
+        ownerName: '万选文旅',
+        status: '交易关闭', 
+        progress: '买家主动取消', 
+        payChannel: 'Wallyt 国际支付',
+        total: 'HKD 310.94', 
+        fee: 'HKD 0.00', 
+        feeRate: '原路全额退款',
+        tax: 'HKD 0.00', 
+        shipping: 'HKD 0.00', 
+        hasSplit: false, 
+        splitStatus: '未分账/已退款',
+        owner: '--', 
+        ownerAmt: '--', 
+        broker: '--', 
+        brokerAmt: '--',
+        customsDeclare: '未推单 (已撤单)',
+        orderTime: '2026-07-22 09:30:00'
+      },
+    ];
+
+    const filteredOrders = orderData.filter(o => {
+      const matchChannel = !orderPayChannelFilter || o.payChannel === orderPayChannelFilter;
+      const matchSearch = !orderSearchQuery || 
+        o.orderId.toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
+        o.payId.toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
+        o.store.toLowerCase().includes(orderSearchQuery.toLowerCase());
+      return matchChannel && matchSearch;
+    });
+
+    return (
+      <div className="animate-in fade-in duration-300 h-full flex flex-col p-6 overflow-y-auto">
+        <div className="mb-6 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+              <div className="w-1 h-5 bg-brand rounded-full"></div>
+              开放平台订单交易与支付资金流向
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">
+              实时监控 Wallyt 国际支付、微信收付通、易生支付三大通道的订单实付资金、通道费率、海关关税、顺丰运费与分账明细
+            </p>
+          </div>
+          <button 
+            onClick={() => showToast('已成功导出 2026年07月开放平台多通道订单交易流水.xlsx')}
+            className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm transition-colors shadow-sm flex items-center gap-2 font-medium"
+          >
+            <Download size={16} /> 导出交易与分账流水
+          </button>
+        </div>
+
+        {/* Payment Channels Top Summary Metrics */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col justify-between">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs font-semibold text-gray-500">Wallyt 国际支付</span>
+              <Tag color="blue">跨境外币/港币</Tag>
+            </div>
+            <div className="text-2xl font-bold text-gray-900 font-mono">HKD 245,800.00</div>
+            <div className="text-[11px] text-gray-500 mt-2 flex items-center justify-between">
+              <span>占比: 52% | 费率: 1.0%</span>
+              <span className="text-blue-600 font-medium">代推海关支付单</span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col justify-between">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs font-semibold text-gray-500">微信收付通</span>
+              <Tag color="green">微信合规分账</Tag>
+            </div>
+            <div className="text-2xl font-bold text-gray-900 font-mono">CNY 68,416.12</div>
+            <div className="text-[11px] text-gray-500 mt-2 flex items-center justify-between">
+              <span>占比: 30% | 费率: 0.6%</span>
+              <span className="text-emerald-600 font-medium">二级商户延迟结算</span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col justify-between">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs font-semibold text-gray-500">易生支付</span>
+              <Tag color="purple">关企直连三单对账</Tag>
+            </div>
+            <div className="text-2xl font-bold text-gray-900 font-mono">CNY 27,900.00</div>
+            <div className="text-[11px] text-gray-500 mt-2 flex items-center justify-between">
+              <span>占比: 18% | 费率: 0.4%</span>
+              <span className="text-purple-600 font-medium">179单实时报关</span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-brand/30 bg-brand-light/10 p-4 flex flex-col justify-between">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs font-semibold text-brand-dark">平台代扣与结算资金</span>
+              <Tag color="orange">关运费代扣</Tag>
+            </div>
+            <div className="text-2xl font-bold text-brand font-mono">￥ 28,450.00</div>
+            <div className="text-[11px] text-gray-600 mt-2">
+              海关关税代扣 + 顺丰直邮运费已自动冲抵
+            </div>
+          </div>
+        </div>
+
+        {/* Filter Bar */}
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
+          <div className="flex gap-3 flex-wrap items-center">
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
+              <input 
+                type="text" 
+                value={orderSearchQuery}
+                onChange={e => setOrderSearchQuery(e.target.value)}
+                className="border border-gray-300 rounded-lg pl-9 pr-3 py-1.5 text-sm w-56 focus:outline-none focus:border-brand" 
+                placeholder="搜索订单号 / 支付流水 / 商家..." 
+              />
+            </div>
+
+            <select 
+              value={orderPayChannelFilter} 
+              onChange={e => setOrderPayChannelFilter(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-brand font-medium text-gray-700 bg-white"
+            >
+              <option value="">全部调用支付渠道 (Wallyt / 微信收付通 / 易生支付)</option>
+              <option value="Wallyt 国际支付">Wallyt 国际支付</option>
+              <option value="微信收付通">微信收付通</option>
+              <option value="易生支付">易生支付</option>
+            </select>
+
+            <button className="bg-brand hover:bg-brand-hover text-white px-5 py-1.5 rounded-lg text-sm transition-colors font-medium">
+              筛选查询
+            </button>
+            {orderPayChannelFilter && (
+              <button 
+                onClick={() => setOrderPayChannelFilter('')}
+                className="text-gray-500 hover:text-gray-700 text-xs underline"
+              >
+                重置渠道筛选
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Orders & Money Flow Table */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto flex-1">
+          <table className="w-full text-left text-sm min-w-max">
+            <thead className="bg-gray-50 border-b border-gray-200 text-gray-600">
+              <tr>
+                <th className="py-3.5 px-4 font-medium">订单号 / 外部支付流水号</th>
+                <th className="py-3.5 px-4 font-medium">调用支付渠道</th>
+                <th className="py-3.5 px-4 font-medium">销售商家 / 货主</th>
+                <th className="py-3.5 px-4 font-medium">实付总额</th>
+                <th className="py-3.5 px-4 font-medium">资金扣除项 (手续费/关税/运费)</th>
+                <th className="py-3.5 px-4 font-medium">分账结算流向</th>
+                <th className="py-3.5 px-4 font-medium">海关支付单推单</th>
+                <th className="py-3.5 px-4 font-medium text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredOrders.map((row, idx) => (
+                <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-3.5 px-4">
+                    <div className="font-mono text-gray-900 font-bold">{row.orderId}</div>
+                    <div className="text-gray-400 text-xs font-mono">流水: {row.payId}</div>
+                    <div className="text-[11px] text-gray-400 mt-0.5">{row.orderTime}</div>
+                  </td>
+
+                  <td className="py-3.5 px-4">
+                    <Tag color={
+                      row.payChannel === 'Wallyt 国际支付' ? 'blue' : 
+                      row.payChannel === '微信收付通' ? 'green' : 'purple'
+                    }>
+                      {row.payChannel}
+                    </Tag>
+                    <div className="text-[11px] text-gray-500 mt-1">{row.feeRate}</div>
+                  </td>
+
+                  <td className="py-3.5 px-4">
+                    <div className="text-gray-900 font-semibold">{row.store}</div>
+                    <div className="text-xs text-gray-500">货主: {row.ownerName}</div>
+                  </td>
+
+                  <td className="py-3.5 px-4">
+                    <div className="font-bold text-gray-900 font-mono text-base">{row.total}</div>
+                    <span className={`text-[11px] px-1.5 py-0.5 rounded font-medium inline-block mt-0.5 ${row.status === '交易关闭' ? 'bg-gray-100 text-gray-500' : 'bg-emerald-50 text-emerald-700'}`}>
+                      {row.status} ({row.progress})
+                    </span>
+                  </td>
+
+                  <td className="py-3.5 px-4 text-xs font-mono">
+                    <div className="space-y-0.5">
+                      <div className="flex justify-between gap-2 text-gray-600">
+                        <span>通道手续费:</span><span className="text-red-500">-{row.fee}</span>
+                      </div>
+                      <div className="flex justify-between gap-2 text-gray-600">
+                        <span>海关关税:</span><span className="text-orange-600">-{row.tax}</span>
+                      </div>
+                      <div className="flex justify-between gap-2 text-gray-600">
+                        <span>顺丰运费:</span><span className="text-blue-600">-{row.shipping}</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="py-3.5 px-4 text-xs">
+                    <div className="font-medium text-gray-800">{row.owner}</div>
+                    <div className="font-mono text-emerald-600 font-bold">{row.ownerAmt}</div>
+                    {row.broker !== '--' && (
+                      <div className="text-[11px] text-gray-500 mt-0.5">
+                        {row.broker}: <span className="font-mono">{row.brokerAmt}</span>
+                      </div>
+                    )}
+                  </td>
+
+                  <td className="py-3.5 px-4 text-xs">
+                    <div className="text-gray-700 font-medium">{row.customsDeclare}</div>
+                    <div className="text-emerald-600 text-[11px] font-semibold mt-0.5">{row.splitStatus}</div>
+                  </td>
+
+                  <td className="py-3.5 px-4 text-right">
+                    <button 
+                      onClick={() => setSelectedOrderDetail(row)} 
+                      className="text-brand hover:text-brand-hover hover:underline text-sm font-semibold flex items-center justify-end gap-1 ml-auto"
+                    >
+                      资金流向详情
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Order Transaction Detail Modal */}
+        {selectedOrderDetail && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center animate-in fade-in duration-200 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-[680px] max-h-[90vh] overflow-y-auto">
+              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/80">
+                <div className="flex items-center gap-2">
+                  <Coins className="text-brand" size={20} />
+                  <h3 className="font-bold text-lg text-gray-900">开放平台订单资金与支付流向全景</h3>
+                </div>
+                <button 
+                  onClick={() => setSelectedOrderDetail(null)} 
+                  className="text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-5 text-sm">
+                {/* Basic Order Bar */}
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs text-gray-500 block">订单编号</span>
+                    <span className="font-mono font-bold text-gray-900">{selectedOrderDetail.orderId}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-500 block">外部支付交易流水号</span>
+                    <span className="font-mono font-bold text-gray-900">{selectedOrderDetail.payId}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-500 block">销售商家 / 归属货主</span>
+                    <span className="font-medium text-gray-900">{selectedOrderDetail.store}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-500 block">下单时间</span>
+                    <span className="font-mono text-gray-700">{selectedOrderDetail.orderTime}</span>
+                  </div>
+                </div>
+
+                {/* Call Payment Gateway Badge */}
+                <div className="border border-blue-200 bg-blue-50/50 rounded-xl p-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-blue-900">调用的底层支付通道</span>
+                    <Tag color={
+                      selectedOrderDetail.payChannel === 'Wallyt 国际支付' ? 'blue' : 
+                      selectedOrderDetail.payChannel === '微信收付通' ? 'green' : 'purple'
+                    }>
+                      {selectedOrderDetail.payChannel}
+                    </Tag>
+                  </div>
+                  <p className="text-xs text-blue-800">
+                    该订单由开放平台统一路由调用 <span className="font-bold">{selectedOrderDetail.payChannel}</span> 接口进行跨境支付收单，通道费率为 {selectedOrderDetail.feeRate}。
+                  </p>
+                </div>
+
+                {/* Flow Diagram */}
+                <div>
+                  <h4 className="font-bold text-gray-800 mb-3 border-l-4 border-brand pl-2">资金拆分与清算流向 (Money Flow Split)</h4>
+                  <div className="space-y-2 font-mono text-xs">
+                    <div className="flex justify-between items-center bg-gray-100 p-2.5 rounded-lg border border-gray-200">
+                      <span className="text-gray-700 font-sans font-medium">1. 客户买家实付金额:</span>
+                      <span className="text-base font-bold text-gray-900">{selectedOrderDetail.total}</span>
+                    </div>
+
+                    <div className="pl-4 space-y-1.5 border-l-2 border-gray-200">
+                      <div className="flex justify-between items-center bg-red-50 p-2 rounded text-red-800 border border-red-100">
+                        <span className="font-sans">[-] 支付通道手续费 ({selectedOrderDetail.feeRate}):</span>
+                        <span className="font-bold">-{selectedOrderDetail.fee}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-orange-50 p-2 rounded text-orange-800 border border-orange-100">
+                        <span className="font-sans">[-] 平台代扣海关关税 (税单对账):</span>
+                        <span className="font-bold">-{selectedOrderDetail.tax}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-blue-50 p-2 rounded text-blue-800 border border-blue-100">
+                        <span className="font-sans">[-] 平台代扣顺丰直邮运费:</span>
+                        <span className="font-bold">-{selectedOrderDetail.shipping}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
+                      <span className="text-emerald-900 font-sans font-bold">2. 货主商家实际结算到账:</span>
+                      <span className="text-base font-bold text-emerald-700">{selectedOrderDetail.ownerAmt} ({selectedOrderDetail.owner})</span>
+                    </div>
+
+                    {selectedOrderDetail.broker !== '--' && (
+                      <div className="flex justify-between items-center bg-purple-50 p-2.5 rounded-lg border border-purple-200">
+                        <span className="text-purple-900 font-sans font-medium">3. 平台分佣 / 分销方佣金:</span>
+                        <span className="text-base font-bold text-purple-700">{selectedOrderDetail.brokerAmt} ({selectedOrderDetail.broker})</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Customs Payment Order Push Status */}
+                <div className="border border-gray-200 rounded-xl p-4 bg-gray-50 space-y-2">
+                  <h4 className="font-bold text-xs text-gray-800">海关三单比对与推单回执</h4>
+                  <div className="text-xs text-gray-600 flex justify-between">
+                    <span>支付单推送状态: <strong className="text-gray-900">{selectedOrderDetail.customsDeclare}</strong></span>
+                    <span className="text-emerald-600 font-bold">{selectedOrderDetail.splitStatus}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                <button 
+                  onClick={() => setSelectedOrderDetail(null)} 
+                  className="px-5 py-2 text-sm bg-brand text-white hover:bg-brand-hover rounded-lg font-medium transition-colors shadow-sm"
+                >
+                  关闭
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // --- 2. Service Account & SF Bill Settlement View ---
+  const renderServiceAccountView = () => {
+    // If a merchant detail drilldown is active
+    if (selectedMerchantDetail) {
+      // Filter waybill bills for this selected merchant
+      const filteredBills = sfBills.filter(b => {
+        const matchesMerchant = b.merchantId === selectedMerchantDetail.merchantId;
+        const matchesOrder = !sfOrderQuery || b.orderId.toLowerCase().includes(sfOrderQuery.toLowerCase().trim());
+        const matchesWaybill = !sfWaybillQuery || b.waybillNo.toLowerCase().includes(sfWaybillQuery.toLowerCase().trim());
+        const matchesStatus = !sfStatusFilter || b.status === sfStatusFilter;
+        return matchesMerchant && matchesOrder && matchesWaybill && matchesStatus;
+      });
+
+      const totalTaxSum = filteredBills.reduce((acc, curr) => acc + curr.tax, 0);
+      const totalFreightSum = filteredBills.reduce((acc, curr) => acc + curr.freight, 0);
+      const totalCostSum = filteredBills.reduce((acc, curr) => acc + curr.totalCost, 0);
+
+      return (
+        <div className="animate-in fade-in duration-200 h-full flex flex-col p-6 overflow-y-auto bg-gray-50/50">
+          {/* Header Navigation */}
+          <div className="mb-6 flex justify-between items-center bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setSelectedMerchantDetail(null)} 
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2.5 rounded-lg transition-colors flex items-center gap-1.5 text-sm font-semibold"
+              >
+                <ArrowLeft size={18} /> 返回服务账户列表
+              </button>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-gray-900">{selectedMerchantDetail.merchantName}</h2>
+                  <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded">ID: {selectedMerchantDetail.merchantId}</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">商家服务账户对账详情 - 账单月度: {selectedMerchantDetail.billingMonth}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => openManualFundModal(selectedMerchantDetail.merchantId, '充值')} 
+                className="bg-brand hover:bg-brand-hover text-white px-4 py-2 rounded-lg text-xs font-semibold transition-colors shadow-sm flex items-center gap-1.5"
+              >
+                <Plus size={15} /> 账户充值 / 调账扣款
+              </button>
+            </div>
+          </div>
+
+          {/* Monthly Settlement Summary Overview Cards */}
+          <div className="grid grid-cols-5 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-xl border border-orange-100 bg-orange-50/30 shadow-sm">
+              <div className="text-xs text-gray-500 font-medium">当月海关关税代扣</div>
+              <div className="text-xl font-bold text-orange-600 font-mono mt-1">￥ {totalTaxSum.toFixed(2)}</div>
+              <div className="text-[11px] text-gray-400 mt-1">海关代扣税单累计</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-blue-100 bg-blue-50/30 shadow-sm">
+              <div className="text-xs text-gray-500 font-medium">当月顺丰月结运费</div>
+              <div className="text-xl font-bold text-blue-600 font-mono mt-1">￥ {totalFreightSum.toFixed(2)}</div>
+              <div className="text-[11px] text-gray-400 mt-1">关联运单 {filteredBills.length} 笔</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <div className="text-xs text-gray-500 font-medium">当月关运费应交合计</div>
+              <div className="text-xl font-bold text-gray-900 font-mono mt-1">￥ {totalCostSum.toFixed(2)}</div>
+              <div className="text-[11px] text-gray-400 mt-1">关税 + 顺丰运费</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-emerald-100 bg-emerald-50/30 shadow-sm">
+              <div className="text-xs text-gray-500 font-medium">服务账户已预扣抵扣</div>
+              <div className="text-xl font-bold text-emerald-600 font-mono mt-1">￥ {(selectedMerchantDetail.preDeducted || totalCostSum).toFixed(2)}</div>
+              <div className="text-[11px] text-emerald-700 font-medium mt-1">实时在服务账户流水中抵扣</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-brand/30 bg-brand-light/10 shadow-sm">
+              <div className="text-xs text-brand-dark font-medium">服务账户当前余额</div>
+              <div className="text-xl font-bold text-brand font-mono mt-1">HKD {selectedMerchantDetail.accountBalance.toFixed(2)}</div>
+              <div className="text-[11px] text-gray-500 mt-1 font-mono">核算状态: {selectedMerchantDetail.status || '已结清'}</div>
+            </div>
+          </div>
+
+          {/* Precision Query Bar */}
+          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6 flex flex-wrap gap-3 items-center justify-between">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1.5 bg-white text-sm">
+                <Search size={15} className="text-gray-400" />
+                <input 
+                  type="text" 
+                  value={sfOrderQuery} 
+                  onChange={e => setSfOrderQuery(e.target.value)} 
+                  placeholder="按订单号查询 (Order ID)" 
+                  className="w-48 outline-none text-sm font-mono"
+                />
+                {sfOrderQuery && <X size={14} className="text-gray-400 cursor-pointer hover:text-gray-600" onClick={() => setSfOrderQuery('')} />}
+              </div>
+
+              <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1.5 bg-white text-sm">
+                <Truck size={15} className="text-brand" />
+                <input 
+                  type="text" 
+                  value={sfWaybillQuery} 
+                  onChange={e => setSfWaybillQuery(e.target.value)} 
+                  placeholder="按顺丰运单号查询 (SF...)" 
+                  className="w-48 outline-none text-sm font-mono"
+                />
+                {sfWaybillQuery && <X size={14} className="text-gray-400 cursor-pointer hover:text-gray-600" onClick={() => setSfWaybillQuery('')} />}
+              </div>
+
+              <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1.5 bg-white text-sm">
+                <Calendar size={15} className="text-gray-400" />
+                <input 
+                  type="date" 
+                  value={sfDateRange.startDate} 
+                  onChange={e => setSfDateRange({...sfDateRange, startDate: e.target.value})} 
+                  className="outline-none text-xs text-gray-700"
+                />
+                <span className="text-gray-300">至</span>
+                <input 
+                  type="date" 
+                  value={sfDateRange.endDate} 
+                  onChange={e => setSfDateRange({...sfDateRange, endDate: e.target.value})} 
+                  className="outline-none text-xs text-gray-700"
+                />
+              </div>
+
+              <select 
+                value={sfStatusFilter} 
+                onChange={e => setSfStatusFilter(e.target.value)}
+                className="border border-gray-300 rounded-md px-3 py-1.5 text-sm bg-white text-gray-700 outline-none"
+              >
+                <option value="">全部结算状态</option>
+                <option value="已结清">已结清</option>
+                <option value="待补缴">待补缴</option>
+                <option value="核算异常">核算异常</option>
+              </select>
+
+              {(sfOrderQuery || sfWaybillQuery || sfDateRange.startDate || sfStatusFilter) && (
+                <button 
+                  onClick={() => { setSfOrderQuery(''); setSfWaybillQuery(''); setSfDateRange({startDate:'', endDate:''}); setSfStatusFilter(''); }} 
+                  className="text-xs text-gray-500 hover:text-gray-800 underline ml-1"
+                >
+                  重置筛选
+                </button>
+              )}
+            </div>
+
+            <button 
+              onClick={() => showToast(`已成功导出【${selectedMerchantDetail.merchantName}】当月关运费明细表`)} 
+              className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
+            >
+              <Download size={14} /> 导出商家单据明细
+            </button>
+          </div>
+
+          {/* Drilldown Detail Table */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200 text-gray-600">
+                <tr>
+                  <th className="py-3.5 px-4 font-medium">顺丰运单号 / 物流公司</th>
+                  <th className="py-3.5 px-4 font-medium">平台订单号 / 支付单号</th>
+                  <th className="py-3.5 px-4 font-medium">揽收/报关时间</th>
+                  <th className="py-3.5 px-4 font-medium">报关关区 / 模式</th>
+                  <th className="py-3.5 px-4 font-medium">申报关税 (CNY)</th>
+                  <th className="py-3.5 px-4 font-medium">实际运费 (CNY)</th>
+                  <th className="py-3.5 px-4 font-medium">费用合计 (CNY)</th>
+                  <th className="py-3.5 px-4 font-medium">结算状态 / 资金来源</th>
+                  <th className="py-3.5 px-4 font-medium text-right">核对备注</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredBills.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className="py-12 text-center text-gray-400">
+                      未找到符合条件的顺丰关运费对账明细记录
+                    </td>
+                  </tr>
+                ) : (
+                  filteredBills.map((bill) => (
+                    <tr key={bill.waybillNo} className="hover:bg-gray-50 transition-colors">
+                      <td className="py-3.5 px-4 font-mono font-medium text-gray-900">
+                        <div>{bill.waybillNo}</div>
+                        <span className="text-[11px] text-gray-400 font-sans">{bill.carrier}</span>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-xs">
+                        <div className="text-brand font-medium">{bill.orderId}</div>
+                        <div className="text-gray-400 font-mono text-[11px]">P: {bill.payId}</div>
+                      </td>
+                      <td className="py-3.5 px-4 text-xs font-mono text-gray-600">
+                        {bill.pickupTime}
+                      </td>
+                      <td className="py-3.5 px-4 text-xs text-gray-700">
+                        <div>{bill.customsDistrict}</div>
+                        <span className="text-[10px] text-gray-400">{bill.importMode}</span>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-orange-600 font-medium">
+                        ￥ {bill.tax.toFixed(2)}
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-blue-600 font-medium">
+                        ￥ {bill.freight.toFixed(2)}
+                      </td>
+                      <td className="py-3.5 px-4 font-mono font-bold text-gray-900">
+                        ￥ {bill.totalCost.toFixed(2)}
+                      </td>
+                      <td className="py-3.5 px-4 text-xs">
+                        <Tag color={bill.status === '已结清' ? 'green' : bill.status === '待补缴' ? 'red' : 'orange'}>
+                          {bill.status}
+                        </Tag>
+                        <div className="text-[11px] text-gray-400 mt-1">{bill.deductSource}</div>
+                      </td>
+                      <td className="py-3.5 px-4 text-right text-xs text-gray-500 font-mono">
+                        {bill.remark}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // --- Main Service Account Summary View ---
+    const totalTaxAll = serviceAccounts.reduce((acc, curr) => acc + curr.taxPayable, 0);
+    const totalFreightAll = serviceAccounts.reduce((acc, curr) => acc + curr.freightPayable, 0);
+    const totalPayableAll = serviceAccounts.reduce((acc, curr) => acc + curr.totalPayable, 0);
+    const totalUnsettledAll = serviceAccounts.reduce((acc, curr) => acc + curr.unsettledAmount, 0);
+
+    // Filter service accounts
+    const filteredAccounts = serviceAccounts.filter(sa => {
+      const matchMonth = !sfBillingMonthSelect || sa.billingMonth === sfBillingMonthSelect;
+      const matchName = !sfMerchantSearch || sa.merchantName.toLowerCase().includes(sfMerchantSearch.toLowerCase().trim()) || sa.merchantId.includes(sfMerchantSearch.trim());
+      return matchMonth && matchName;
+    });
+
+    return (
+      <div className="animate-in fade-in duration-300 h-full flex flex-col p-6 overflow-y-auto">
+        <div className="mb-6 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+              <div className="w-1 h-5 bg-brand rounded-full"></div>
+              服务账户与顺丰月度对账
+            </h2>
+            <p className="text-xs text-gray-400 mt-1">作为平台统一核算商家顺丰跨境直邮关税与运费账单，支持表单导入、预扣抵扣与手动充值变更</p>
+          </div>
+
+          <div className="flex gap-3">
+            <button 
+              onClick={() => setImportSfModalOpen(true)}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
+            >
+              <FileSpreadsheet size={16} /> 导入顺丰月度表单
+            </button>
+
+            <button 
+              onClick={() => openManualFundModal(undefined, '充值')}
+              className="bg-brand hover:bg-brand-hover text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-sm flex items-center gap-1.5"
+            >
+              <Plus size={16} /> 新增充值/扣减
+            </button>
+
+            <button 
+              onClick={() => showToast('顺丰关运费平台对账汇总大表已导出')}
+              className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5"
+            >
+              <Download size={16} /> 导出对账表
+            </button>
+          </div>
+        </div>
+
+        {/* Top SF Summary Metric Cards */}
+        <div className="grid grid-cols-4 gap-5 mb-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div className="text-xs font-medium text-gray-500 mb-1 flex justify-between items-center">
+              <span>顺丰当月关税总应付</span>
+              <span className="text-[10px] bg-red-50 text-red-600 border border-red-200 px-1.5 py-0.5 rounded font-bold">SF 月结</span>
+            </div>
+            <div className="text-2xl font-bold text-gray-900 font-mono">￥ {totalTaxAll.toFixed(2)}</div>
+            <div className="text-[11px] text-gray-400 mt-2">海关跨境 BC / BBC 保税清单</div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div className="text-xs font-medium text-gray-500 mb-1 flex justify-between items-center">
+              <span>顺丰当月运费总应付</span>
+              <span className="text-[10px] bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded font-bold">物流运单</span>
+            </div>
+            <div className="text-2xl font-bold text-gray-900 font-mono">￥ {totalFreightAll.toFixed(2)}</div>
+            <div className="text-[11px] text-gray-400 mt-2">含国际揽收与国内干线派送</div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div className="text-xs font-medium text-gray-500 mb-1">商家关运费合计应缴</div>
+            <div className="text-2xl font-bold text-brand font-mono">￥ {totalPayableAll.toFixed(2)}</div>
+            <div className="text-[11px] text-emerald-600 mt-2 flex items-center gap-1">
+              <CheckCircle2 size={12} /> 平台已预扣大部分账款
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div className="text-xs font-medium text-gray-500 mb-1">待结算/未补缴总额</div>
+            <div className="text-2xl font-bold text-orange-600 font-mono">￥ {totalUnsettledAll.toFixed(2)}</div>
+            <div className="text-[11px] text-orange-500 mt-2">需提示商家手动补缴充值</div>
+          </div>
+        </div>
+
+        {/* Toolbar & Sub-Tab Navigation */}
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex justify-between items-center flex-wrap gap-4">
+          <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+            <button 
+              onClick={() => setServiceSubTab('summary')}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${serviceSubTab === 'summary' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+            >
+              商家关运费对账汇总表
+            </button>
+            <button 
+              onClick={() => setServiceSubTab('journals')}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${serviceSubTab === 'journals' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+            >
+              账户资金变更流水 ({accountJournals.length})
+            </button>
+          </div>
+
+          {serviceSubTab === 'summary' && (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1.5 bg-white text-sm">
+                <Calendar size={15} className="text-gray-400" />
+                <span className="text-xs text-gray-500">账单月份:</span>
+                <select 
+                  value={sfBillingMonthSelect} 
+                  onChange={e => setSfBillingMonthSelect(e.target.value)}
+                  className="outline-none text-sm font-medium text-gray-800 bg-transparent"
+                >
+                  <option value="2026-07">2026年07月 (最新账单)</option>
+                  <option value="2026-06">2026年06月</option>
+                  <option value="2026-05">2026年05月</option>
+                </select>
+              </div>
+
+              <div className="relative">
+                <Search className="absolute left-3 top-2.5 text-gray-400" size={15} />
+                <input 
+                  type="text" 
+                  value={sfMerchantSearch}
+                  onChange={e => setSfMerchantSearch(e.target.value)}
+                  placeholder="搜索商家名称 / ID..."
+                  className="border border-gray-300 rounded-md pl-9 pr-3 py-1.5 text-sm w-52 focus:outline-none focus:border-brand"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Content Section */}
+        {serviceSubTab === 'summary' ? (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200 text-gray-600">
+                <tr>
+                  <th className="py-3.5 px-4 font-medium">商家 ID / 商家名称</th>
+                  <th className="py-3.5 px-4 font-medium">账单月份</th>
+                  <th className="py-3.5 px-4 font-medium">当月应付关税</th>
+                  <th className="py-3.5 px-4 font-medium">当月应付运费</th>
+                  <th className="py-3.5 px-4 font-medium">应交费用合计</th>
+                  <th className="py-3.5 px-4 font-medium">已预扣/已抵扣</th>
+                  <th className="py-3.5 px-4 font-medium">待结算/应补缴</th>
+                  <th className="py-3.5 px-4 font-medium">服务账户余额</th>
+                  <th className="py-3.5 px-4 font-medium">核算状态</th>
+                  <th className="py-3.5 px-4 font-medium text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredAccounts.map((item) => (
+                  <tr key={item.merchantId} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-4 px-4">
+                      <div className="font-semibold text-gray-900">{item.merchantName}</div>
+                      <div className="text-gray-400 text-xs font-mono">ID: {item.merchantId}</div>
+                    </td>
+                    <td className="py-4 px-4 font-mono text-gray-600 text-xs">{item.billingMonth}</td>
+                    <td className="py-4 px-4 font-mono text-orange-600">￥ {item.taxPayable.toFixed(2)}</td>
+                    <td className="py-4 px-4 font-mono text-blue-600">￥ {item.freightPayable.toFixed(2)}</td>
+                    <td className="py-4 px-4 font-mono font-bold text-gray-900">￥ {item.totalPayable.toFixed(2)}</td>
+                    <td className="py-4 px-4 font-mono text-emerald-600">￥ {item.preDeducted.toFixed(2)}</td>
+                    <td className="py-4 px-4 font-mono">
+                      {item.unsettledAmount > 0 ? (
+                        <span className="text-red-600 font-bold bg-red-50 border border-red-200 px-2 py-0.5 rounded text-xs">
+                          ￥ {item.unsettledAmount.toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 text-xs">￥ 0.00</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-4 font-mono font-bold text-gray-800">
+                      HKD {item.accountBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}
+                    </td>
+                    <td className="py-4 px-4">
+                      <Tag color={item.status === '已结清' ? 'green' : 'orange'}>
+                        {item.status}
+                      </Tag>
+                    </td>
+                    <td className="py-4 px-4 text-right space-x-3">
+                      <button 
+                        onClick={() => setSelectedMerchantDetail(item)}
+                        className="text-brand hover:text-brand-hover font-semibold hover:underline text-sm"
+                      >
+                        查看对账详情
+                      </button>
+                      <button 
+                        onClick={() => openManualFundModal(item.merchantId, '充值')}
+                        className="text-gray-700 hover:text-gray-900 font-medium hover:underline text-sm"
+                      >
+                        充值/扣款
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          /* Journals Table */
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200 text-gray-600">
+                <tr>
+                  <th className="py-3.5 px-4 font-medium">流水号</th>
+                  <th className="py-3.5 px-4 font-medium">商家名称 / ID</th>
+                  <th className="py-3.5 px-4 font-medium">变更类型</th>
+                  <th className="py-3.5 px-4 font-medium">变更金额</th>
+                  <th className="py-3.5 px-4 font-medium">币种</th>
+                  <th className="py-3.5 px-4 font-medium">变更后余额</th>
+                  <th className="py-3.5 px-4 font-medium">操作时间</th>
+                  <th className="py-3.5 px-4 font-medium">经办人</th>
+                  <th className="py-3.5 px-4 font-medium">业务备注说明</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {accountJournals.map((j) => (
+                  <tr key={j.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-3.5 px-4 font-mono text-xs text-gray-500">{j.id}</td>
+                    <td className="py-3.5 px-4">
+                      <div className="font-medium text-gray-900">{j.merchantName}</div>
+                      <div className="text-gray-400 text-xs font-mono">{j.merchantId}</div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <Tag color={j.type === '充值' ? 'green' : 'orange'}>{j.type}</Tag>
+                    </td>
+                    <td className={`py-3.5 px-4 font-mono font-bold ${j.amount >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {j.amount >= 0 ? `+${j.amount.toFixed(2)}` : j.amount.toFixed(2)}
+                    </td>
+                    <td className="py-3.5 px-4 font-mono text-gray-600">{j.currency}</td>
+                    <td className="py-3.5 px-4 font-mono font-medium text-gray-800">
+                      HKD {j.balanceAfter.toFixed(2)}
+                    </td>
+                    <td className="py-3.5 px-4 text-xs font-mono text-gray-500">{j.time}</td>
+                    <td className="py-3.5 px-4 text-gray-700 text-xs">{j.operator}</td>
+                    <td className="py-3.5 px-4 text-xs text-gray-500 max-w-xs truncate" title={j.remark}>{j.remark}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderCustomsConfig = () => {
     return (
@@ -1570,8 +2845,8 @@ export default function App() {
         {activeNav === 'miniapps' && renderMiniProgramView()}
         {activeNav === 'public-products' && renderPublicLibraryView()}
         {activeNav === 'hscode' && renderHSCodeView()}
-        {activeNav === 'funds' && renderFundsView()}
-        {activeNav === 'mapping' && renderCategoryMappingView()}
+        {(activeNav === 'funds' || activeNav === 'funds-orders') && renderOrderTransactionsView()}
+        {activeNav === 'funds-service' && renderServiceAccountView()}
         {activeNav === 'customs-config' && renderCustomsConfig()}
         {activeNav === 'customs-products' && renderCustomsProducts()}
         {activeNav === 'customs-orders' && renderCustomsOrders()}
@@ -1624,171 +2899,63 @@ export default function App() {
                   <div className="flex justify-between items-center">
                     <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">基本资料</h3>
                     {!isEditingMerchant ? (
-                      <button onClick={() => setIsEditingMerchant(true)} className="text-brand text-sm flex items-center gap-1 hover:underline"><Edit2 size={14}/> 编辑信息</button>
+                      <button onClick={handleStartEditingBasic} className="text-brand text-sm flex items-center gap-1 hover:underline"><Edit2 size={14}/> 编辑信息</button>
                     ) : (
                       <div className="flex gap-2">
                         <button onClick={() => setIsEditingMerchant(false)} className="text-gray-500 text-sm hover:underline">取消</button>
-                        <button onClick={() => setIsEditingMerchant(false)} className="bg-brand text-white px-3 py-1 rounded text-sm flex items-center gap-1 hover:bg-brand-hover"><Save size={14}/> 保存</button>
+                        <button onClick={handleSaveBasicInfo} className="bg-brand text-white px-3 py-1 rounded text-sm flex items-center gap-1 hover:bg-brand-hover shadow-sm"><Save size={14}/> 保存</button>
                       </div>
                     )}
                   </div>
                   
                   {isEditingMerchant ? (
-                    <div className="grid grid-cols-2 gap-y-6 gap-x-8 text-sm bg-gray-50 p-5 rounded-lg border border-gray-200">
-                      <div>
-                        <label className="text-gray-500 block mb-1.5">商家ID (不可修改)</label>
-                        <input type="text" disabled value={detailDrawer.merchant.id} className="w-full border border-gray-200 bg-gray-100 rounded px-3 py-2 text-gray-500 font-mono" />
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-y-5 gap-x-8 text-sm bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <div>
+                          <label className="text-gray-500 block mb-1.5">商家ID (不可修改)</label>
+                          <input type="text" disabled value={detailDrawer.merchant.id} className="w-full border border-gray-200 bg-gray-100 rounded px-3 py-2 text-gray-500 font-mono" />
+                        </div>
+                        <div>
+                          <label className="text-gray-500 block mb-1.5">登录手机号</label>
+                          <input type="text" value={editMerchantPhone} onChange={e => setEditMerchantPhone(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
+                        </div>
+                        <div>
+                          <label className="text-gray-500 block mb-1.5">商家名称</label>
+                          <input type="text" value={editMerchantName} onChange={e => setEditMerchantName(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
+                        </div>
+                        <div>
+                          <label className="text-gray-500 block mb-1.5">角色类型</label>
+                          <select value={editMerchantRole} onChange={e => setEditMerchantRole(e.target.value as any)} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none font-medium">
+                            <option value="服务商">服务商</option>
+                            <option value="主理人">主理人</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-gray-500 block mb-1.5">当前状态</label>
+                          <select value={editMerchantStatus} onChange={e => setEditMerchantStatus(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none">
+                            <option value="运营中">运营中</option>
+                            <option value="已关闭">已关闭</option>
+                          </select>
+                        </div>
                       </div>
-                      <div>
-                        <label className="text-gray-500 block mb-1.5">登录手机号</label>
-                        <input type="text" defaultValue={detailDrawer.merchant.phone} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
-                      </div>
-                      <div>
-                        <label className="text-gray-500 block mb-1.5">商家名称</label>
-                        <input type="text" defaultValue={detailDrawer.merchant.name} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none" />
-                      </div>
-                      <div>
-                        <label className="text-gray-500 block mb-1.5">角色类型</label>
-                        <select defaultValue={detailDrawer.merchant.role} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                          <option>服务商</option>
-                          <option>主理人</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-gray-500 block mb-1.5">当前状态</label>
-                        <select defaultValue={detailDrawer.merchant.status} className="w-full border border-gray-300 rounded px-3 py-2 focus:border-brand focus:ring-1 focus:ring-brand outline-none">
-                          <option value="运营中">运营中</option>
-                          <option value="已关闭">已关闭</option>
-                        </select>
-                      </div>
+
+                      {detailDrawer.merchant.role === '主理人' && editMerchantRole === '服务商' && (
+                        <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3.5 rounded-lg flex items-start gap-2">
+                          <span className="font-bold shrink-0">⚠️ 提示:</span>
+                          <div>从【主理人】切换为【服务商】，保存后将自动清空原绑定的微信商户号及关联逻辑，需重新配置独立的商户号。</div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 gap-y-6 gap-x-8 text-sm">
                       <div><span className="text-gray-500 block mb-1">商家ID</span><span className="font-mono text-gray-800">{detailDrawer.merchant.id}</span></div>
                       <div><span className="text-gray-500 block mb-1">登录手机号</span><span className="font-mono text-gray-800">{detailDrawer.merchant.phone}</span></div>
                       <div><span className="text-gray-500 block mb-1">商家名称</span><span className="text-gray-800">{detailDrawer.merchant.name}</span></div>
-                      <div><span className="text-gray-500 block mb-1">角色类型</span><span className="text-gray-800">{detailDrawer.merchant.role}</span></div>
+                      <div><span className="text-gray-500 block mb-1">角色类型</span><span className="text-gray-800 font-medium">{detailDrawer.merchant.role}</span></div>
                       <div><span className="text-gray-500 block mb-1">入驻时间</span><span className="text-gray-800">2026-01-15</span></div>
                       <div><span className="text-gray-500 block mb-1">当前状态</span><span className={detailDrawer.merchant.status === '运营中' ? 'text-gray-700' : 'text-gray-500'}>{detailDrawer.merchant.status}</span></div>
                     </div>
                   )}
-
-                  <div className="pt-6 border-t border-gray-200 mt-6">
-                    <div className="flex justify-between items-center mb-6">
-                      <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">集市业务属性与权限</h3>
-                      {(!isEditingMerchant && detailDrawer.merchant.role === '服务商') ? (
-                        <button onClick={() => setIsEditingMerchant(true)} className="text-brand text-sm flex items-center gap-1 hover:underline"><Edit2 size={14}/> 编辑权限</button>
-                      ) : null}
-                    </div>
-                    
-                    {detailDrawer.merchant.role === '主理人' ? (
-                       <div className="text-sm text-gray-500 italic bg-gray-50 p-4 rounded-lg border border-gray-200">
-                         作为主理人角色，集市选品范围继承自上级服务商，此项不可独立设置。
-                       </div>
-                    ) : (isEditingMerchant && detailDrawer.merchant.role === '服务商') ? (
-                      <div className="space-y-6 bg-gray-50 p-5 rounded-lg border border-gray-200">
-                        <div>
-                          <label className="text-brand font-medium block mb-3 text-sm border-l-2 border-brand pl-2">作为【买方】的集市选品获取范围</label>
-                          <div className="flex gap-6 mb-4">
-                            <label className="flex items-center gap-2 text-sm cursor-pointer">
-                              <input type="radio" name="marketScope" checked={editingMarketScope === '全部集市商品'} onChange={() => setEditingMarketScope('全部集市商品')} className="text-brand focus:ring-brand" />
-                              全部集市商品
-                            </label>
-                            <label className="flex items-center gap-2 text-sm cursor-pointer">
-                              <input type="radio" name="marketScope" checked={editingMarketScope === '限定货源'} onChange={() => setEditingMarketScope('限定货源')} className="text-brand focus:ring-brand" />
-                              限定货源
-                            </label>
-                          </div>
-                          
-                          {editingMarketScope === '限定货源' && (
-                            <div className="bg-white p-4 rounded border border-gray-200 animate-in fade-in slide-in-from-top-2">
-                              <div className="text-sm text-gray-500 mb-3">配置限定货源组合 (商家ID + 品牌 + 分类)</div>
-                              <div className="flex gap-3 items-center mb-3">
-                                {/* Merchant Searchable Select */}
-                                <div className="relative group">
-                                  <div className="flex items-center border border-gray-300 rounded px-2 py-1.5 bg-white w-44 focus-within:border-brand focus-within:ring-1 focus-within:ring-brand cursor-text transition-all">
-                                    <Search size={14} className="text-gray-400 mr-1.5 flex-shrink-0" />
-                                    <input type="text" placeholder="搜索商家..." className="w-full text-sm outline-none bg-transparent min-w-0 text-gray-700 placeholder:text-gray-400" />
-                                    <ChevronDown size={14} className="text-gray-400 ml-1 flex-shrink-0" />
-                                  </div>
-                                  <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg hidden group-focus-within:block z-20">
-                                    <div className="max-h-48 overflow-y-auto py-1">
-                                      <div className="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer text-gray-700">1014 - 万选文旅</div>
-                                      <div className="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer text-gray-700">1023 - 万选奢品全球购</div>
-                                      <div className="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer text-gray-700">2055 - HAN加盟店</div>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <span className="text-gray-400">+</span>
-
-                                {/* Brand Searchable Multi-Select */}
-                                <div className="relative group">
-                                  <div className="flex items-center border border-gray-300 rounded px-2 py-1.5 bg-white w-44 focus-within:border-black focus-within:ring-1 focus-within:ring-black cursor-text transition-all">
-                                    <Search size={14} className="text-gray-400 mr-1.5 flex-shrink-0" />
-                                    <input type="text" placeholder="搜索品牌(多选)..." className="w-full text-sm outline-none bg-transparent min-w-0 text-gray-700 placeholder:text-gray-400" />
-                                    <ChevronDown size={14} className="text-gray-400 ml-1 flex-shrink-0" />
-                                  </div>
-                                  <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg hidden group-focus-within:block z-20">
-                                    <div className="max-h-48 overflow-y-auto py-1">
-                                      <label className="flex items-center px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer gap-2 text-gray-700">
-                                        <input type="checkbox" className="rounded border-gray-300 text-brand focus:ring-brand" /> THE ANDAMANE
-                                      </label>
-                                      <label className="flex items-center px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer gap-2 text-gray-700">
-                                        <input type="checkbox" className="rounded border-gray-300 text-brand focus:ring-brand" /> GUCCI
-                                      </label>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <span className="text-gray-400">+</span>
-
-                                {/* Category Searchable Multi-Select */}
-                                <div className="relative group">
-                                  <div className="flex items-center border border-gray-300 rounded px-2 py-1.5 bg-white w-44 focus-within:border-black focus-within:ring-1 focus-within:ring-black cursor-text transition-all">
-                                    <Search size={14} className="text-gray-400 mr-1.5 flex-shrink-0" />
-                                    <input type="text" placeholder="搜索分类(多选)..." className="w-full text-sm outline-none bg-transparent min-w-0 text-gray-700 placeholder:text-gray-400" />
-                                    <ChevronDown size={14} className="text-gray-400 ml-1 flex-shrink-0" />
-                                  </div>
-                                  <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg hidden group-focus-within:block z-20">
-                                    <div className="max-h-48 overflow-y-auto py-1">
-                                      <label className="flex items-center px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer gap-2 text-gray-700">
-                                        <input type="checkbox" className="rounded border-gray-300 text-brand focus:ring-brand" /> 服装 &gt; 上衣
-                                      </label>
-                                      <label className="flex items-center px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer gap-2 text-gray-700">
-                                        <input type="checkbox" className="rounded border-gray-300 text-brand focus:ring-brand" /> 箱包
-                                      </label>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <button className="bg-brand text-white hover:bg-brand-hover px-4 py-1.5 rounded text-sm transition-colors font-medium whitespace-nowrap">添加组合</button>
-                              </div>
-                              <div className="space-y-2">
-                                <div className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded text-sm border border-gray-100">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-mono text-gray-500">1014</span>
-                                    <span className="text-gray-300">|</span>
-                                    <span>THE ANDAMANE</span>
-                                    <span className="text-gray-300">|</span>
-                                    <span>服装 &gt; 上衣</span>
-                                  </div>
-                                  <button className="text-brand hover:text-gray-700"><X size={14} /></button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ) : (detailDrawer.merchant.role === '服务商') ? (
-                      <div className="grid grid-cols-2 gap-y-6 gap-x-8 text-sm">
-                        <div>
-                          <span className="text-gray-500 block mb-1">作为买方的选品范围</span>
-                          <span className="text-gray-800">{detailDrawer.merchant.marketScope || '全部集市商品'}</span>
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
                 </div>
               )}
               {detailDrawer.activeTab === 'miniapp' && (
@@ -1821,23 +2988,93 @@ export default function App() {
               )}
               {detailDrawer.activeTab === 'payment' && (
                 <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">微信支付商户号配置</h3>
-                    <button className="text-brand text-sm hover:underline font-medium">修改配置</button>
-                  </div>
-                  <div className="bg-gray-50 p-5 rounded-lg border border-gray-200 grid grid-cols-2 gap-6 text-sm">
-                    <div><span className="text-gray-500 block mb-1.5">国内商户号 (MchID)</span><span className="font-mono text-gray-800">{detailDrawer.merchant.payment?.domesticMchId || '未配置'}</span></div>
-                    <div><span className="text-gray-500 block mb-1.5">配置状态</span><span className="text-gray-700 font-medium">{detailDrawer.merchant.payment?.status || '未配置'}</span></div>
-                    
-                    {detailDrawer.merchant.role === '服务商' && (
-                      <div className="col-span-2 pt-4 border-t border-gray-200 mt-2">
-                        <span className="text-gray-500 block mb-1.5">国际商户号 (Overseas MchID)</span>
-                        <span className="font-mono text-gray-800">{detailDrawer.merchant.payment?.internationalMchId || '未配置'}</span>
+                  {!isEditingPayment ? (
+                    <>
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">微信支付商户号配置</h3>
+                        <button onClick={handleStartEditingPayment} className="text-brand text-sm hover:underline font-medium flex items-center gap-1">
+                          <Edit2 size={14}/> 修改配置
+                        </button>
                       </div>
-                    )}
-                    
-                    <div className="col-span-2 pt-4 border-t border-gray-200 mt-2"><span className="text-gray-500 block mb-1.5">API v3 密钥</span><span className="font-mono text-gray-400 tracking-widest">************************</span></div>
-                  </div>
+                      <div className="bg-gray-50 p-5 rounded-lg border border-gray-200 grid grid-cols-2 gap-6 text-sm">
+                        <div>
+                          <span className="text-gray-500 block mb-1.5">国内商户号 (MchID)</span>
+                          <span className="font-mono text-gray-800 font-medium">{detailDrawer.merchant.payment?.domesticMchId || '未配置'}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 block mb-1.5">国际商户号 (Overseas MchID)</span>
+                          <span className="font-mono text-gray-800 font-medium">{detailDrawer.merchant.payment?.internationalMchId || '未配置'}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 block mb-1.5">配置状态</span>
+                          <Tag color={detailDrawer.merchant.payment?.domesticMchId || detailDrawer.merchant.payment?.internationalMchId ? 'green' : 'slate'}>
+                            {detailDrawer.merchant.payment?.status || '未配置'}
+                          </Tag>
+                        </div>
+                        {detailDrawer.merchant.payment?.linkedInfo && (
+                          <div className="pt-1">
+                            <span className="text-gray-500 block mb-1.5">关联模式说明</span>
+                            <span className="text-brand bg-brand-light/30 border border-brand/20 px-2.5 py-1 rounded text-xs font-medium inline-block">
+                              {detailDrawer.merchant.payment.linkedInfo}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-medium text-gray-800 border-l-4 border-brand pl-3">编辑微信支付商户号</h3>
+                        <div className="flex gap-2">
+                          <button onClick={() => setIsEditingPayment(false)} className="text-gray-500 text-sm hover:underline">取消</button>
+                          <button onClick={handleSavePayment} className="bg-brand text-white px-3 py-1 rounded text-sm flex items-center gap-1 hover:bg-brand-hover shadow-sm">
+                            <Save size={14}/> 保存配置
+                          </button>
+                        </div>
+                      </div>
+                      <div className="bg-gray-50 p-5 rounded-lg border border-gray-200 space-y-5 text-sm">
+                        <div className="grid grid-cols-2 gap-6">
+                          <div>
+                            <label className="text-gray-700 font-medium block mb-1.5">国内商户号 (MchID)</label>
+                            <input 
+                              type="text" 
+                              value={paymentForm.domesticMchId} 
+                              onChange={e => setPaymentForm({...paymentForm, domesticMchId: e.target.value, linkedInfo: ''})} 
+                              placeholder="请输入国内微信支付商户号 (如 1600000001)" 
+                              className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none font-mono" 
+                            />
+                          </div>
+                          <div>
+                            <label className="text-gray-700 font-medium block mb-1.5">国际商户号 (Overseas MchID)</label>
+                            <input 
+                              type="text" 
+                              value={paymentForm.internationalMchId} 
+                              onChange={e => setPaymentForm({...paymentForm, internationalMchId: e.target.value})} 
+                              placeholder="请输入国际微信支付商户号 (如 HK99001122)" 
+                              className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none font-mono" 
+                            />
+                          </div>
+                        </div>
+
+                        {detailDrawer.merchant.role === '主理人' && (
+                          <div className="pt-3 border-t border-gray-200 flex items-center justify-between">
+                            <span className="text-xs text-gray-500">主理人快捷模式:</span>
+                            <button 
+                              type="button" 
+                              onClick={() => setPaymentForm({
+                                ...paymentForm, 
+                                domesticMchId: '1600000001', 
+                                linkedInfo: '复用服务商商户号'
+                              })} 
+                              className="text-xs text-brand hover:underline font-medium"
+                            >
+                              复用上级服务商商户号
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
               {detailDrawer.activeTab === 'filing' && (
@@ -1865,31 +3102,52 @@ export default function App() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center animate-in fade-in duration-200">
           <div className="bg-white rounded-xl shadow-xl w-[500px] overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-              <h3 className="font-semibold text-lg text-gray-800">{addModal.type === 'provider' ? '新增服务商' : '新增下级商家'}</h3>
+              <h3 className="font-semibold text-lg text-gray-800">{addModal.type === 'provider' ? '新增服务商' : '新增下级主理人'}</h3>
               <button onClick={() => setAddModal({isOpen: false, type: 'provider'})} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
             </div>
             <div className="p-6 space-y-5">
               {addModal.type === 'sub' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">所属服务商</label>
-                  <input type="text" disabled value={mockMerchants.find(m => m.id === addModal.parentId)?.name || ''} className="w-full border border-gray-200 bg-gray-50 rounded-md px-3 py-2 text-sm text-gray-500" />
+                  <input type="text" disabled value={merchants.find(m => m.id === addModal.parentId)?.name || ''} className="w-full border border-gray-200 bg-gray-50 rounded-md px-3 py-2 text-sm text-gray-500 font-medium" />
                 </div>
               )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">商家名称 <span className="text-brand">*</span></label>
-                <input type="text" placeholder="请输入商家营业执照名称" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all" />
+                <input 
+                  type="text" 
+                  value={addForm.name} 
+                  onChange={e => setAddForm({...addForm, name: e.target.value})} 
+                  placeholder={addModal.type === 'provider' ? "请输入服务商营业执照/企业名称" : "请输入主理人商家名称"} 
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all" 
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">登录手机号 <span className="text-brand">*</span></label>
-                <input type="text" placeholder="11位手机号，将作为该商家的唯一登录账号" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all" />
-                <p className="text-xs text-gray-400 mt-2 flex items-start gap-1">
-                  <span className="text-brand mt-0.5">*</span> 创建成功后，系统将自动发送包含初始密码的短信至该手机号。
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-gray-700">登录手机号 <span className="text-brand">*</span></label>
+                  <button 
+                    type="button" 
+                    onClick={() => setAddForm({...addForm, phone: `${addModal.type === 'provider' ? '138' : '139'}${Math.floor(10000000 + Math.random() * 89999999).toString().slice(0, 8)}`})} 
+                    className="text-xs text-brand hover:underline font-normal"
+                  >
+                    自动生成新手机号
+                  </button>
+                </div>
+                <input 
+                  type="text" 
+                  value={addForm.phone} 
+                  onChange={e => setAddForm({...addForm, phone: e.target.value})} 
+                  placeholder="11位手机号，将作为该商家的唯一登录账号" 
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all font-mono" 
+                />
+                <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                  <span className="text-brand">*</span> 已自动为您填入常用手机号，创建成功后初始默认密码为 123456
                 </p>
               </div>
             </div>
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
               <button onClick={() => setAddModal({isOpen: false, type: 'provider'})} className="px-5 py-2 text-sm text-gray-600 hover:bg-gray-200 rounded-md transition-colors font-medium">取消</button>
-              <button onClick={() => setAddModal({isOpen: false, type: 'provider'})} className="px-5 py-2 text-sm bg-brand text-white hover:bg-brand-hover rounded-md transition-colors font-medium shadow-sm">确认创建</button>
+              <button onClick={handleCreateMerchant} className="px-5 py-2 text-sm bg-brand text-white hover:bg-brand-hover rounded-md transition-colors font-medium shadow-sm">确认创建</button>
             </div>
           </div>
         </div>
@@ -3135,6 +4393,211 @@ export default function App() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* SF Monthly Bill Import Modal */}
+      {importSfModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl shadow-xl w-[640px] overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/80">
+              <div className="flex items-center gap-2">
+                <FileSpreadsheet className="text-red-600" size={20} />
+                <h3 className="font-semibold text-lg text-gray-900">导入顺丰月度报关关税及运费账单</h3>
+              </div>
+              <button 
+                onClick={() => setImportSfModalOpen(false)} 
+                className="text-gray-400 hover:text-gray-700 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">选择对账月度 <span className="text-red-500">*</span></label>
+                  <select 
+                    value={sfImportMonth} 
+                    onChange={e => setSfImportMonth(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-brand outline-none"
+                  >
+                    <option value="2026-07">2026年07月 (最新账单)</option>
+                    <option value="2026-06">2026年06月</option>
+                    <option value="2026-05">2026年05月</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">对账物流渠道</label>
+                  <input 
+                    type="text" 
+                    readOnly 
+                    value="顺丰速运 - 跨境直邮模式" 
+                    className="w-full border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none font-medium"
+                  />
+                </div>
+              </div>
+
+              {/* Upload Drop Area */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1.5">顺丰月度 Excel 表单文件 <span className="text-red-500">*</span></label>
+                <div className="border-2 border-dashed border-gray-300 hover:border-red-400 bg-gray-50/50 hover:bg-red-50/20 rounded-xl p-6 text-center cursor-pointer transition-colors group">
+                  <Upload className="mx-auto text-gray-400 group-hover:text-red-500 mb-2 transition-colors" size={32} />
+                  <div className="text-sm font-medium text-gray-800 mb-1">{importedFileName}</div>
+                  <p className="text-xs text-gray-400">支持拖拽 .xlsx / .csv 文件，系统将自动基于订单号和运单号对账匹配</p>
+                  <button 
+                    onClick={() => setImportedFileName('已重选: SF_202607_Customs_Logistics_Monthly_Bill.xlsx')}
+                    className="mt-3 inline-flex items-center gap-1 bg-white border border-gray-300 text-gray-700 text-xs px-3 py-1 rounded-md font-medium shadow-sm hover:bg-gray-50"
+                  >
+                    重新选择本地文件
+                  </button>
+                </div>
+              </div>
+
+              {/* Automatic Parsing Preview */}
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-xs space-y-2">
+                <div className="font-bold text-emerald-800 flex items-center gap-1.5">
+                  <CheckCircle2 size={16} className="text-emerald-600" />
+                  解析准备就绪 (7 笔运单，匹配率 100%)
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-emerald-900 pt-1">
+                  <div>· 顺丰关税小计: <span className="font-mono font-bold">￥ 969.50</span></div>
+                  <div>· 顺丰运费小计: <span className="font-mono font-bold">￥ 355.00</span></div>
+                  <div>· 涉及商家数: <span className="font-mono font-bold">4 家</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+              <button 
+                onClick={() => setImportSfModalOpen(false)} 
+                className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-200 rounded-lg font-medium border border-gray-300 bg-white"
+              >
+                取消
+              </button>
+              <button 
+                onClick={handleImportSfBillConfirm}
+                className="px-5 py-2 text-sm bg-red-600 text-white hover:bg-red-700 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-1.5"
+              >
+                <CheckCircle2 size={16} /> 确认导入并核算对账
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Manual Fund Top-up / Deduction Modal */}
+      {manualFundModal.isOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl shadow-xl w-[520px] overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/80">
+              <div className="flex items-center gap-2">
+                <Coins className="text-brand" size={20} />
+                <h3 className="font-semibold text-lg text-gray-900">服务账户资金变更 / 关运费抵扣</h3>
+              </div>
+              <button 
+                onClick={() => setManualFundModal(prev => ({ ...prev, isOpen: false }))} 
+                className="text-gray-400 hover:text-gray-700 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4 text-sm">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">目标商家 <span className="text-red-500">*</span></label>
+                <select 
+                  value={manualFundModal.merchantId}
+                  onChange={e => {
+                    const mId = e.target.value;
+                    const mName = serviceAccounts.find(s => s.merchantId === mId)?.merchantName || '';
+                    setManualFundModal(prev => ({ ...prev, merchantId: mId, merchantName: mName }));
+                  }}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-brand outline-none font-medium text-gray-800"
+                >
+                  {serviceAccounts.map(s => (
+                    <option key={s.merchantId} value={s.merchantId}>
+                      {s.merchantName} ({s.merchantId}) - 当前余额: HKD {s.accountBalance.toFixed(2)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">变更类型 <span className="text-red-500">*</span></label>
+                <div className="grid grid-cols-3 gap-3">
+                  {(['充值', '抵扣关运费', '手动调整'] as const).map(t => (
+                    <button 
+                      key={t}
+                      type="button"
+                      onClick={() => setManualFundModal(prev => ({ ...prev, type: t }))}
+                      className={`py-2 rounded-lg border text-xs font-semibold transition-all ${manualFundModal.type === t ? 'border-brand bg-brand-light/20 text-brand shadow-sm' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-2">
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">变更金额 <span className="text-red-500">*</span></label>
+                  <input 
+                    type="number" 
+                    value={manualFundModal.amount} 
+                    onChange={e => setManualFundModal(prev => ({ ...prev, amount: e.target.value }))}
+                    placeholder="如: 5000.00"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-brand outline-none font-mono font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">币种</label>
+                  <select 
+                    value={manualFundModal.currency}
+                    onChange={e => setManualFundModal(prev => ({ ...prev, currency: e.target.value as any }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-brand outline-none font-bold"
+                  >
+                    <option value="HKD">HKD (港币)</option>
+                    <option value="CNY">CNY (人民币)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">业务备注说明</label>
+                <textarea 
+                  rows={3}
+                  value={manualFundModal.remark}
+                  onChange={e => setManualFundModal(prev => ({ ...prev, remark: e.target.value }))}
+                  placeholder="请输入充值凭证号、转账流水或核算抵扣事由..."
+                  className="w-full border border-gray-300 rounded-lg p-2.5 text-xs focus:border-brand outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+              <button 
+                onClick={() => setManualFundModal(prev => ({ ...prev, isOpen: false }))} 
+                className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-200 rounded-lg font-medium border border-gray-300 bg-white"
+              >
+                取消
+              </button>
+              <button 
+                onClick={handleManualFundSubmit}
+                className="px-5 py-2 text-sm bg-brand text-white hover:bg-brand-hover rounded-lg font-medium transition-colors shadow-sm"
+              >
+                确认提交
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Global Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-medium flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-200 border border-gray-700">
+          <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
+          <span>{toastMessage}</span>
         </div>
       )}
     </div>
